@@ -1,0 +1,8 @@
+# Ignore this crap
+
+*.pyc
+.DS_STORE
+env.py
+flask/
+flask_session/
+migrations/
