@@ -14,26 +14,35 @@ class User(db.Model, Serializer):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), index= True, nullable=False)
+    username = db.Column(db.String(50), index=True, nullable=False)
     email = db.Column(db.String(100), index=True, nullable=False)
-    username = db.Column(db.String(25), index=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    pic_path = db.Column(db.String(150), nullable=True)
 
-    def __init__(self, email, username, password, pic_path):
-        self.email = email
+    def __init__(self, name, username, email, password):
+        self.name = name
         self.username = username
+        self.email = email
         self.password = password
-        self.pic_path = pic_path
 
-class Message(db.Model, Serializer):
-    __tablename__ = 'messages'
+class Central(db.Model, Serializer):
+    __tablename__ = 'centrals'
 
     id = db.Column(db.Integer, primary_key=True)
-    messageTxt = db.Column(db.Text, nullable=False)
-    dateTime = db.Column(db.DateTime, index=True, nullable=False)
-    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    device_UUID = db.Column(db.Integer, nullable=False)
+    location = db.Column(db.String(20), index=True, nullable=False)
 
-    def __init__(self, messageTxt, dateTime, sender_id):
-        self.messageTxt = messageTxt
-        self.dateTime = dateTime
-        self.sender_id = sender_id
+    def __init__(self, device_UUID, location):
+        self.device_UUID = device_UUID
+        self.location = location
+
+class Peripheral(db.Model, Serializer):
+    __tablename__ = 'peripherals'
+
+    id = db.Column(db.Integer, primary_key=True)
+    device_UUID = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    def __init__(self, device_UUID, user_id):
+        self.device_UUID = device_UUID
+        self.user_id = user_id
