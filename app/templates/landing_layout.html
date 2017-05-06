@@ -1,0 +1,27 @@
+<!-- app/templates/layout.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  {% block css %}
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/header_footer.css') }}">
+  {% endblock %}
+  <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300i,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Alegreya+Sans:300,400,500,800" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+  <title>FitQuest</title>
+</head>
+<body>
+  {% include "/home/header.html" %}
+    {% block content %}
+    {% endblock %}
+  {% include "/home/footer.html" %}
+</body>
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+<script  type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vide/0.5.1/jquery.vide.min.js"></script>
+{% endblock js %}
+</html>
