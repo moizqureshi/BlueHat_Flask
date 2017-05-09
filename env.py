@@ -1,0 +1,5 @@
+FLASK_CONFIG = 'development'
+THE_SECRET_KEY = 'vt1(h3c#$z6gyp6jkfpi^w+*x3#mq!_0aifwr^*nf)l02+dij4'
+DB_USER = ''
+DB_PASS = ''
+DB_NAME = 'bluehat_app'
