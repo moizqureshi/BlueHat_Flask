@@ -32,9 +32,6 @@ from env import *
 # Instantiate the app
 app = create_app(FLASK_CONFIG)
 
-# Socket-IO Config
-socketio = SocketIO(app)
-
 
 ''' =========================================================================================== '''
 # BlueHat Web Routes
@@ -278,4 +275,4 @@ def index_view():
 ''' =========================================================================================== '''
 # run the app
 if __name__ == '__main__':
-    socketio.run(app)
+    app.run()
