@@ -1,118 +1,562 @@
 <!-- app/templates/home/index.html -->
 <!-- EXTEND landing_layout.html and create the main chat window -->
 {% extends "landing_layout.html" %}
+{% block css %}
+  {{ super() }}
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock css %}
 {% block body %}
-<!-- Navbar -->
-<nav class="navbar navbar-inverse navbar-fixed-top" id="my-navbar">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" date-toggle="collapse" data-target="#navbar-collapse">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-</button>
-
-<a href="" class="navbar-brand">BlueHat</a>
-    </div>
-    <div class="collapse navbar-collapse" id="navbar-collapse">
-    <a href="" class="btn btn-warning navbar-btn navbar-right">Download Now</a>
-      <ul class="nav navbar-nav">
-  <li><a href="#feedback">Feedback</a>
-  <li><a href="#gallery">Gallery</a>
-  <li><a href="#features">Features</a>
-  <li><a href="#faq">Faq</a>
-  <li><a href="#contact">ContactUs</a>
-</ul>
-    </div>
-  </div>
-</nav>
-
 <div class="jumbotron">
   <div class="container text-center">
     <h1>BlueHat </h1>
-    <p> </p>
-    <div class="btn-group">
-      <a href="" class="btn btn-lg btn-warning">Download App</a>
-      <a href="" class="btn btn-lg btn-default">Visit store</a>
-      <a href="" class="btn btn-lg btn-info">Spread the word</a>
-    </div>
   </div>
-
   <div class="container">
     <section>
-     <div class="page-header" id="feedback">
-       <h2>Feedback.</h2><small>Check out the Awesome Feedback</small></h2>
+     <div class="page-header" id="charter">
+       <h2 class="red-text text-center">Project Charter</h2>
      </div>
+     <h3>Overview</h3>
+     <p>Project BlueHat aims to improve the safety of personnel at outdoor
+       facilities in emergency situations by providing a new solution to
+       emergency mustering. By adopting bluetooth low energy technology
+       we remove the need for expensive hi-gain RFID antennas which existing
+       solutions use. Project BlueHat trilaterates personnel using a peripheral
+       bluetooth low energy device embedded into the top of safety hard-hats
+       which advertise bio-sensor and RSSI (received signal strength indicator)
+       data to many central bluetooth low energy nodes that are placed throughout
+       a facility.
+     </p>
+     <p>
+       These central devices relay data of scanned nearby peripheral
+       devices to our backend server, where RSSI values of scanned peripheral
+       devices are Kalman filtered for conversion to distance values.
+       These distance values are then used to perform a trilateration of a
+       peripheral device. By knowing the location of personnel in a facility
+       during an emergency situation, we can determine who is moving to a
+       designated safe zone or not, and also determine the state of an individual
+       depending on their bio-sensor data. Furthermore, this information can
+       be sent to emergency services to better prepare in helping personnel
+       who have not made it to a designated safe-zone.
+     </p>
+     <hr>
+     <h3>Team Members</h3>
+     <p>Moiz Qureshi - Hardware Sub-Team & Project Lead
+      <br>Ben Chafik - Hardware Sub-Team
+      <br>Ye Huang - Cloud Software Sub-Team
+      <br>Eduardo Rosales - Cloud Software Sub-Team</br>
+    </pre>
 
-     <div class="row">
-       <div class="col-lg-4">
-   <blockquote>
-     <p>This video is part of my Bootstrap 3 tutorials for beginners,
-     the link to the playlist is given above. This video is designed
-     in such a way that even a noob who doesn't know anything about
-     bootstrap or html or Css can create a website from start to
-     finish.But if you want to know Bootstrap in details than i have
-     created 18 videos for beginners just for you guys, link is given
-     above. </p>
-   </blockquote>
- </div>
-       <div class="col-lg-4">
-   <blockquote>
-     <p>This video is part of my Bootstrap 3 tutorials for beginners,
-     the link to the playlist is given above. This video is designed
-     in such a way that even a noob who doesn't know anything about
-     bootstrap or html or Css can create a website from start to
-     finish.But if you want to know Bootstrap in details than i have
-     created 18 videos for beginners just for you guys, link is given
-     above. </p>
-   </blockquote>
- </div>
-       <div class="col-lg-4">
-   <blockquote>
-     <p>This video is part of my Bootstrap 3 tutorials for beginners,
-     the link to the playlist is given above. This video is designed
-     in such a way that even a noob who doesn't know anything about
-     bootstrap or html or Css can create a website from start to
-     finish.But if you want to know Bootstrap in details than i have
-     created 18 videos for beginners just for you guys, link is given
-     above. </p>
-   </blockquote>
- </div>
-    </div>
+      <hr>
+      <h3>Project Approach</h3>
+      <p>
+      We will be utilizing Nordic Semiconductor’s Bluetooth Low Energy (BLE)
+      nRF52832 chipset and their accompanying development kit (nRF52) for this
+      chipset to implement our Peripheral and Central devices. In conjunction
+      with the nRF52-based Central device, we will be connecting a Raspberry
+      Pi-0 via UART connection in order to have WiFi & internet connectivity.
+      </p>
+      <p>
+      The Peripheral device acts as an advertising agent that broadcasts packets
+      specific to a universally unique identifier (UUID), where only Central devices
+      that are scanning for broadcasts identified by that UUID can receive those
+      advertised packets. The packet payload will initially contain information
+      regarding which peripheral device is broadcasting that packet, as well as
+      a received signal strength indication (dbm represented in one byte as a
+      two’s complement integer value). By having a network of Central devices
+      places throughout an outdoor facility, each Central device will be constantly
+      scanning for Peripheral devices and  reading their advertised packet data.
+      Each Central device will then periodically send a list of its scanned
+      Peripheral devices and their data via the Raspberry Pi-0 to our backend
+      server as JSON data over a direct socket connection. The backend webserver
+      will read this JSON data on a specified socket, where RSSI values for each
+      Peripheral device’s advertising packet will be run through a Kalman filter
+      for statistically accurate conversion to a distance value. Once these distance
+      values have been calculated, we can trilaterate the position of that
+      Peripheral device with respect to its three nearest Central devices.
+      </p>
+      <p>
+      The backend webserver will be implemented using the Python Flask framework,
+      since it is lightweight, but very extensible. It is framework that our
+      team has experience with already and has a relatively quick development
+      time to implement an API and socket server. Furthermore, data collection
+      and parsing ease is greatly enhanced when all the data is JSON formatted.
+      Also, from this Python-Flask server application, we can also use it to
+      host our web-based dashboard where we can the present the state of our
+      ecosystem in a user-friendly way. From the web-based dashboard we plan
+      to show all the Central (fixed location) and Peripheral (individuals
+      wearing our smart hard-hats) overlaid on a map of that outdoor facility.
+      We can display the results of a Peripheral device trilateration on this map,
+      and determine which individuals have made it to a designated safe zone,
+      are on moving towards one, or are completely immobile.
+      </p>
+
+      <hr>
+      <h3>Project Objectives</h3>
+      <p>
+      The objective of Project BlueHat is to provide a working system of BLE
+      Central & Peripheral devices, where each Central device will periodically
+      relay to the our backend webserver a list of scanned nearby Peripheral
+      devices. The backend webserver is where we offload heavy calculation
+      such as Kalman Filtering and trilateration of peripheral devices,
+      which we can then present this information on our web-dashboard
+      in a user-friendly manner. Therefore our goals for this quarter is
+      to design and develop the system described previously as well as
+      carry-out some real-world outdoor testing, since this system is
+      intended to be used outdoors.
+      </p>
+
+      <hr>
+      <h3>Major Deliverables</h3>
+      <ul>
+        <li>Central & Peripheral Hardware (nRF52 & Raspberry Pi-0) - May 13rd, 2017
+            Hardware Sub-Team: Moiz Qureshi & Ben Chafik</li>
+        <li>Backend Webserver (API & Sockets) using Python Flask - May 13rd, 2017
+            Cloud Software Sub-Team: Ye Huang & Eduardo Rosales</li>
+        <li>Kalman Filtering Algorithm (on backend webserver) - May 20th, 2017
+            Whole Team: Moiz Qureshi, Ben Chafik, Ye Huang, & Eduardo Rosales</li>
+        <li>Trilateration Algorithm (on backend webserver) - May 28th, 2017
+            Whole Team: Moiz Qureshi, Ben Chafik, Ye Huang, & Eduardo Rosales</li>
+        <li>Web-based, user-friendly dashboard - June 2nd, 2017
+            Whole Team: Moiz Qureshi, Ben Chafik, Ye Huang, & Eduardo Rosales</li>
+        <li>System-wide Test - June 5th, 2017
+            Whole Team: Moiz Qureshi, Ben Chafik, Ye Huang, & Eduardo Rosales</li>
+      </ul>
+
+      <p>
+        Time permitting and if we are ahead of schedule, we will also be integrating
+         bio-sensors such as a pulse sensor to the Peripheral device to also relay
+         individual pulse data along with RSSI to nearby Central devices.
+      </p>
+
+      <hr>
+      <h3>Constraints, Risk, & Feasibility</h3>
+      <p>
+        The only major risks we face pertain to the algorithms that we will be
+        implementing on the backend webserver, specifically the Kalman filtering
+        and trilateration algorithms. The accuracy of RSSI values (between Central
+         and Peripheral devices) without any Kalman filtering are not suitable for
+          distance estimation within 1-3 meters. No one in the team has experience
+          with Kalman filtering, however we have already began researching this
+          algorithm and have found several research papers implementing it in
+          similar use cases. Furthermore, we have developed a solid plan to mock
+          RSSI data in order to train and test our implementation of the Kalman
+          filter algorithm. By doing this we can statistically analyze the accuracy
+           of real RSSI values pre and post Kalman filtering, in order to achieve
+           a distance estimation within our goal of 1-3 meters. Once we established
+           a working implementation of our Kalman filter, trilaterationof a
+           Peripheral device from the three nearest Central devices will be trivial.
+         </p>
+         <p>Other minor risks include:</p>
+         <ul>
+           <li>One or more member could fall sick and not be able to perform/deliver.</li>
+           <li>Inability to pick up/learn new techniques and languages that are crucial to the development.</li>
+           <li>Other classes and commitments, they could potential cause us to fall behind.</li>
+           <li>Devices malfunction and would need to reorder which takes time.</li>
+          </ul>
   </section>
 </div>
 
-<!-- call to action -->
+
+<div class="container">
 <section>
-  <div class="well">
-    <div class="container text-center">
-      <h3>Subscribe for more free stuff</h3>
-<p>Enter your name and email</p>
+ <div class="page-header" id="groupmanagement">
+   <h2 class="red-text text-center">Group Management</h2>
+ </div>
 
-      <form action="" class="form-inline">
-  <div class="form-group">
-    <label for="subscription">Subscribe</label>
-    <input type="text" class="form-control" id="subscription" placeholder="Your name">
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+<div class="panel-heading">
+<div class="panel-title">
+  <a href="#collapse-1" data-toggle="collapse" data-parent="#accordion">
+    What are the major roles in your group’s management?
+  </a>
+</div><!-- End panel title -->
+<div id="collapse-1" class="panel-collapse collapse">
+  <div class="panel-body">
+    Moiz Qureshi is the leader of the team, but our group (Moiz, Ben, Ye, Eduardo)
+    will be divided into two subgroups. Moiz and Ben will be on the hardware group.
+     Both will be tasked to work on the central and peripheral bluetooth devices.
+     Ye and Eduardo will be on the software group. Both will tasked to create the
+     backend web server that will be used to communicate with the central and
+     peripheral devices.
   </div>
+</div><!-- End Panel collapse -->
+</div>
+</div>
 
-  <div class="form-group">
-    <label for="email">Email address</label>
-    <input type="text" class="form-control" id="email" placeholder="Enter you Email">
+  <div class="panel panel-default">
+<div class="panel-heading">
+<div class="panel-title">
+  <a href="#collapse-2" data-toggle="collapse" data-parent="#accordion">
+    How will decisions be made? By leader, consensus?
+  </a>
+</div><!-- End panel title -->
+<div id="collapse-2" class="panel-collapse collapse">
+  <div class="panel-body">
+    So far, our group has utilized various communication technologies,
+    such as Slack, Messenger, Trello, Email, and in-person group meetings.
+    We aim to meet, as a team, in person, as often as possible. So far,
+    our group has designated Tuesdays and the weekend as “team meeting” days.
+    Our main form of communication when not meeting in-person will be via Messenger,
+    and Trello is being utilized to keep our members accountable and to track our progress.
+    Furthermore, our team also has a Github repository so that our team can work efficiently
+    when writing code, remotely.
   </div>
-  <button type="submit" class="btn btn-default">Subscribe</button>
-  <hr>
-</form>
+</div><!-- End Panel collapse -->
+</div>
+</div>
 
-    </div><!-- end Container -->
-  </div><!-- end well -->
+<div class="panel panel-default">
+<div class="panel-heading">
+  <div class="panel-title">
+  <a href="#collapse-3" data-toggle="collapse" data-parent="#accordion">
+    How will you communicate? Email, meetings in the lab, discussion board?
+  </a>
+  </div><!-- End panel title -->
+  <div id="collapse-3" class="panel-collapse collapse">
+    <div class="panel-body">
+      So far, our group has utilized various communication technologies,
+      such as Slack, Messenger, Trello, Email, and in-person group meetings.
+      We aim to meet, as a team, in person, as often as possible. So far,
+      our group has designated Tuesdays and the weekend as “team meeting” days.
+      Our main form of communication when not meeting in-person will be via Messenger,
+      and Trello is being utilized to keep our members accountable and to track our progress.
+      Furthermore, our team also has a Github repository so that our team can work
+      efficiently when writing code, remotely.
+    </div>
+  </div><!-- End Panel collapse -->
+</div>
+</div>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+  <div class="panel-title">
+  <a href="#collapse-4" data-toggle="collapse" data-parent="#accordion">
+    How will you know when you’re off schedule, and how will you deal with schedule slips?
+  </a>
+  </div><!-- End panel title -->
+  <div id="collapse-4" class="panel-collapse collapse">
+    <div class="panel-body">
+      Our team has be utilizing Trello, a web-based project management application.
+      This application is very useful, and will allow our team to track our progress,
+       milestones, project deliverables, and help keep ourselves accountable.
+       Trello has a main dashboard, and we have already created a milestone and the
+       tasks associated with it. For each task, we have already assigned members and
+       added reasonable completion times for when we expect the work to be completed by.
+       By maintaining persistent communication with the group and utilizing Trello,
+       we will be able to deal with schedule slips.
+    </div>
+  </div><!-- End Panel collapse -->
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="panel-title">
+    <a href="#collapse-5" data-toggle="collapse" data-parent="#accordion">
+    Who is responsible for which deliverables and milestones?
+    </a>
+    </div><!-- End panel title -->
+    <div id="collapse-5" class="panel-collapse collapse">
+      <div class="panel-body">
+        So far, our group has identified two deliverables. One of the deliverables
+        is the completion of the central and peripheral devices. This task will be
+        carried out by Moiz and Ben. The second deliverable is the development of
+        the backend web server that will be used to communicate with the central
+        and peripheral devices, and will also be used to register such devices
+        and to track locations from the trilateration of such devices. This task
+        will be carried out by Ye and Eduardo. The milestones for the the backend
+        web server are as follows: the creation of the backend web server,
+        implementing the registration of the devices and user profiles, and
+        developing the view used for tracking such devices.
+      </div>
+    </div><!-- End Panel collapse -->
+  </div>
+</div>
+
+
+</div>
 </section>
+</div>
+
+
+
+
+<!-- Development -->
+<div class="container">
+  <section>
+    <div class="page-header" id="development">
+      <h2 class="red-text text-center">Project Development</h2>
+    </div>
+    <p>
+      The project splits into two halves, a server half and a firmware half.
+      Because of this we are splitting the development between two sub-groups
+       and assigned one half to a single sub-group.
+     </p>
+    <h3>Server Sub-Team:</h3>
+    <p>
+      This is the backend server group, consists of Eduardo Rosale and Ye Huang.
+      They are assigned the role to setup a webserver where the central devices
+      going to communicate with, do their calculation and then update the dashboard.
+    </p>
+
+    <p>
+      The backend webserver is going to be using Flask Server Framework and SocketIO.
+      These two frameworks/libraries are free and available to be used. Flask Server
+      is going to help us implement a database where we can store and read information
+      while SocketIO is going to help us communicate/connect with RPi0 (Raspberry pi 0)
+      which are the server’s main and only clients.
+    </p>
+
+    <p>
+      The central devices fill a JSON with informations needed then feeds it back
+      (using RPi0) to the server, as we are still developing these central devices
+      we are going to have to test the web-server with mocking JSON payload sent by
+      us to the web-server and compare output with expected output. All the tests
+      done are going to be document containing input, output, expected output and comments.
+    </p>
+
+    <p>
+    Backend server will have its own proper documentation denoting different HTTP
+    routes and HTTP verbs used. For example GET and POST to give and get information,
+    respectively. In addition, the documentation will include a description of the
+    JSON of information required by the server.
+    </p>
+    <hr>
+    <h3>Firmware Sub-Team:</h3>
+    <p>
+      This is the embedded systems group, consists of Moiz Qureshi and Aymane Chafik (Ben).
+       They are assigned the role to setup the central and peripheral devices.
+       The central devices will be embedded to retrieve information from the peripheral
+       devices and then using a serial connection (UART) to the RPi0 the central
+       device is then able to send the information to the web-server.
+     </p>
+    <p>
+      Both Peripheral and central are going to be implemented with NRF52 each.
+      This device costs about $40 each, we have already ordered it and is on hand.
+      NRF52 uses ARM-GCC to compile C code and is free to use. In addition to Peripheral,
+      the central device is going to include an RPi-0. The RPi-0 is going to allow
+      the NRF52 constructing the central device to connect to the internet and thus
+      communicate with the server. The RPi-0 costs $10 and has also been ordered and delivered.
+    </p>
+    <p>
+      Testing for embedded devices is going to be done manually by analyzing output
+      of our firmware. This is to check and see if the nearby devices (a.k.a peripherals)
+      are scanned correctly. In addition we will be using Nordic Semiconductor Computer
+       Application tools to see if we are able to gather the information needed is written
+       and caught properly.
+     </p>
+    <p>
+      This part will not include any API documentation. However, it will include
+       a test report documentation where we document test results such as recording
+       the rssi values at known distances in open air of peripheral-to-central.
+     </p>
+    <p>
+      Outside of the sub-groups, when we are all together, we will be documenting
+      those weekly design reviews. This documentation will include progress,
+      issues or plusses on our weekly milestones/deliverables.
+    </p>
+
+  </section>
+</div>
+
+
+<div class="container">
+    <section>
+     <div class="page-header" id="schedule">
+       <h2 class="red-text text-center">Project Schedule</h2>
+ <h3>Milestone 1 - May 13rd, 2017:</h3>
+     </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+      <h4> Deliverable 1A: (Moiz Qureshi & Ben Chafik)</h4>
+      <p>
+            Develop & test firmware for the nRF52 Dev Kit & Raspberry Pi-0
+      which will act as a Bluetooth Low Energy Central device.
+      </p>
+      <ul>
+              <li>Develop & test firmware for the nRF52 Dev Kit & Raspberry
+  Pi-0 which will act as a Bluetooth Low Energy Central
+  device.</li>
+              <li>Apr 25th, 2017 - May 9th, 2017: Develop Central device
+  firmware, establish UART connection to Raspberry Pi-0, and
+  develop Python code which will send data from the Raspberry Pi-0
+  to the backend webserver.</li>
+              <li>May 9th, 2017 - May 13rd, 2017: Test Central device firmware
+  in conjunction with Raspberry Pi-0 code.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+            <h4>Deliverable 1B: (Moiz Qureshi & Ben Chafik)</h4>
+      <p>
+      Develop & test firmware for the nRF52 Dev Kit which will act as a
+      Bluetooth Low Energy Peripheral device.
+      </p>
+       <ul>
+              <li>
+  Apr 25th, 2017 - May 9th, 2017: Develop Peripheral device firmware.
+  </li>
+
+              <li>
+  May 9th, 2017 - May 13rd, 2017: Test Peripheral device firmware.
+  </li>
+            </ul>
+
+          </div>
+  </div>
+</div>
+
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+            <h4>Deliverable 1C: (Ye Huang & Eduardo Rosales) </h4>
+      <p>
+      Develop backend webserver Python Flask framework. Implement base
+      API and SocketIO communication with Raspberry Pi-0 connected to
+      nRF52 Central devices.
+      </p>
+       <ul>
+              <li>
+              Apr 25, 2017 - May 13, 2017: Develop backend webserver Python Flask framework.
+              </li>
+            </ul>
+          </div>
+  </div>
+</div>
+
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+            <h4>Deliverable 1D: (Ye Huang & Eduardo Rosales) </h4>
+       <p>
+       Test backend webserver communication with Raspberry Pi-0 using
+       socket communications by writing Python script to send dummy
+       JSON data (list of nearby scanned peripheral devices for each
+       central device).
+       </p>
+       <ul>
+              <li>
+              May 9, 2017 - May 13rd, 2017: Test backend webserver communication with devices
+  </li>
+            </ul>
+          </div>
+  </div>
+</div>
+
+
+
+
+
+      <h3>Milestone 2 - Jun 5th, 2017:</h3>
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+      <h4>Deliverable 2A: (Moiz Qureshi & Ben Chafik) -  Jun 5th, 2017</h4>
+      <p>
+               Tune nRF52 Central & Peripheral TX/RX power characteristics for a more stable RSSI reading.
+      </p>
+      <ul>
+              <li>
+              May 14th, 2017 - May 23rd, 2017: Tune Central & Peripheral power characteristics
+  </li>
+            </ul>
+    </div>
+  </div>
+</div>
+
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+            <h4>Deliverable 2B: (Whole Team) - Jun 5th, 2017</h4>
+      <p>
+      Implement Kalman filtering algorithm and interface with trained RSSI data (from testing location).
+      </p>
+       <ul>
+              <li>
+              May 14th, 2017 - May 20th, 2017: Implement Kalman filtering algorithm & interface
+  </li>
+            </ul>
+          </div>
+  </div>
+</div>
+
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+            <h4>Deliverable 2C: (Whole Team) - Jun 5th, 2017</h4>
+      <p>
+      Implement trilateration algorithm using Kalman filtered RSSI readings to get coordinates of Peripheral devices.
+      </p>
+       <ul>
+              <li>
+  May 21st, 2017 - May 28th, 2017: Implement trilateration algorithm
+              </li>
+            </ul>
+          </div>
+  </div>
+</div>
+
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+            <h4>Deliverable 2D: (Whole Team) - Jun 5th, 2017</h4>
+       <p>
+       Design & develop user-friendly web-dashboard to view system status of Central & Peripheral devices
+       </p>
+       <ul>
+              <li>
+              May 29th, 2017 - Jun 2nd, 2017: Design & develop user-friendly web-dashboard
+  </li>
+            </ul>
+          </div>
+  </div>
+</div>
+
+      <div class="col-lg-12">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <span class="glyphicon glyphicon-star"></span>
+            <h4> Deliverable 3: (Whole Team) - Jun 5th, 2017</h4>
+       <p>
+       Project testing for testing the whole system outdoors. Record the video for the final report.
+       </p>
+       <ul>
+              <li>
+        Jun 3nd, 2017 - Jun 5th, 2017: Design & develop user-friendly web-dashboard
+        </li>
+            </ul>
+          </div>
+  </div>
+</div>
+
+    </div><!-- end row -->
+  </section>
+
+</div><!-- End Container -->
+
 
 <!-- Gallery -->
 <div class="container">
   <section>
-    <div class="page-header" id="feedback">
-      <h2>Gallery.<small> Check out the Awesome Feedback</small></h2>
+    <div class="page-header" id="gallery">
+      <h2 class="red-text text-center">Gallery</h2>
     </div>
   </section>
 </div>
@@ -123,33 +567,23 @@
   <ol class="carousel-indicators">
     <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
     <li data-target="#myCarousel" data-slide-to="1"></li>
-    <li data-target="#myCarousel" data-slide-to="2"></li>
   </ol>
 
   <!-- Wrapper for slides -->
   <div class="carousel-inner">
     <div class="item active">
-      <img src="highway.jpg" alt="Text for the image">
+      <img class="img-responsive center-block" src="{{ url_for('static', filename='imgs/IMG_0150.JPG') }}" alt="Text for the image">
       <div class="carousel-caption">
-  <h3>Highway heading</h3>
-  <p>This is a caption</p>
+  <h3></h3>
 </div>
     </div>
     <div class="item">
-      <img src="painting.jpg" alt="Text for the image">
+      <img class="img-responsive center-block" src="{{ url_for('static', filename='imgs/IMG_0151.PNG') }}" alt="Text for the image">
       <div class="carousel-caption">
-  <h3>Painting heading</h3>
-  <p>This is a caption</p>
+  <h3></h3>
 </div>
     </div>
-    <div class="item">
-      <img src="street.jpg" alt="Text for the image">
-      <div class="carousel-caption">
-  <h3>Street heading</h3>
-  <p>This is a caption</p>
-</div>
     </div>
-  </div>
 
   <!-- Left and right controls -->
   <a class="left carousel-control" href="#myCarousel" data-slide="prev">
@@ -162,9 +596,24 @@
   </a>
 </div><!-- End Carousel -->
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<div class="container">
+  <section>
+    <div class="page-header" id="links">
+      <h2 class="red-text text-center">Project Links</h2>
+    </div>
+    <p class="link-row">
+      <a href="https://trello.com/b/XdQIpMh7"><p style="text-align:center"> <i class="fa fa-trello" aria-hidden="true"></i> Trello</p></a>
+    </p>
+    <p class="link-row">
+      <a href="https://github.com/moizqureshi/BlueHat_nRF52_Peripheral"><p style="text-align:center"><i class="fa fa-github" aria-hidden="true"></i> Github-Peripheral</p></a>
+    </p>
+    <p class="link-row">
+      <a href="https://github.com/moizqureshi/BlueHat_nRF52_Central"><p style="text-align:center"><i class="fa fa-github" aria-hidden="true"></i> Github-Central</p></a>
+    </p>
+    <p class="link-row">
+      <a href="https://github.com/moizqureshi/BlueHat_Flask"><p style="text-align:center"> <i class="fa fa-github" aria-hidden="true"></i> Github-Flask</p></a>
+    </p>
+  </section>
+</div>
 
-
-{% endblock %}
+{% endblock body %}
