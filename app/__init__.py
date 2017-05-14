@@ -1,20 +1,26 @@
+# local imports
+from config import app_config
+from env import *
+
 # third-party imports
 from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO
 
+async_mode = "eventlet"
 
-# local imports
-from config import app_config
-from env import *
 
 # db variable initialization
 db = SQLAlchemy()
 
-# App Config
+# Basic App Config
 app = Flask(__name__)
+
+# SocketIO Config
+socketio = SocketIO(app, async_mode=async_mode)
+
 app.config.from_object(app_config[FLASK_CONFIG])
 app.config.from_pyfile('config.py')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True

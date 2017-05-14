@@ -1,3 +1,3 @@
 export FLASK_APP=bluehat.py
 heroku ps:scale web=1
-web: gunicorn bluehat:app
+web: gunicorn --worker-class eventlet -w 1 bluehat:app
