@@ -42,7 +42,6 @@ Return Type: Prints statement on server side when client connects
 '''
 @socketio.on('connect')
 def socketio_connect():
-    emit('bluehat_server_response', {'data': 'BlueHat Server: You are connected'})
     print('BlueHat Client device connected!')
 
 '''
