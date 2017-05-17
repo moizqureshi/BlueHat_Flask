@@ -1,5 +1,6 @@
 alembic==0.9.1
 appdirs==1.4.3
+backports.ssl-match-hostname==3.5.0.1
 click==6.7
 enum-compat==0.0.2
 enum34==1.1.6
@@ -23,7 +24,9 @@ pyparsing==2.2.0
 python-editor==1.0.3
 python-engineio==1.4.0
 python-socketio==1.7.4
-requests==2.13.0
+requests==2.14.2
 six==1.10.0
+socketIO-client==0.7.2
 SQLAlchemy==1.1.9
+websocket-client==0.40.0
 Werkzeug==0.12.1

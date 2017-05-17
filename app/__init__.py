@@ -9,8 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
 
-async_mode = "eventlet"
-
 
 # db variable initialization
 db = SQLAlchemy()
@@ -19,7 +17,7 @@ db = SQLAlchemy()
 app = Flask(__name__)
 
 # SocketIO Config
-socketio = SocketIO(app, async_mode=async_mode)
+socketio = SocketIO(app)
 
 app.config.from_object(app_config[FLASK_CONFIG])
 app.config.from_pyfile('config.py')

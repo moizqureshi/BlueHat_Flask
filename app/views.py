@@ -36,30 +36,41 @@ def index_view():
 
 
 '''
+Description: SocketIO connect event method for all clients
+Input: None
+Return Type: Prints statement on server side when client connects
+'''
+@socketio.on('connect')
+def socketio_connect():
+    emit('bluehat_server_response', {'data': 'BlueHat Server: You are connected'})
+    print('BlueHat Client device connected!')
+
+'''
 Description: SocketIO connect event method for BlueHat Observer Devices
 Input: None
 Return Type: Prints statement on server side when client disconnects
 '''
-@socketio.on('connect', namespace='/BlueHatObserver')
+@socketio.on('observer_connect')
 def bluehatObserver_socketio_connect():
-    emit('my response', {'data': 'Connected'})
+    emit('bluehat_server_response', {'data': 'BlueHat Server: You are connected'})
     print('BlueHat Observer device connected!')
 
 
 '''
-Description: SocketIO discconect event method for BlueHat Observer devices
+Description: SocketIO discconect event method for any client
 Input: None
 Return Type: Prints statement on server side when client disconnects
 '''
-@socketio.on('disconnect', namespace='/BlueHatObserver')
-def bluehatObserver_socketio_disconnect():
-    print('BlueHat Observer device disconnected!')
+@socketio.on('disconnect')
+def socketio_disconnect():
+    print('BlueHat Client disconnected!')
 
 '''
 Description: SocketIO event method that handles messages sent BlueHat Observer devices
 Input: None
 Return Type: None
 '''
-@socketio.on('observer_json_msg', namespace='/BlueHatObserver')
-def handleMessage(json_data):
+@socketio.on('observer_json_msg')
+def handleObserverMessage(json_data):
     print json_data
+    emit('bluehat_server_response', json_data)
