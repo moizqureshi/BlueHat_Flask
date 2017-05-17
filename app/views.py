@@ -40,19 +40,9 @@ Description: SocketIO connect event method for all clients
 Input: None
 Return Type: Prints statement on server side when client connects
 '''
-@socketio.on('connect')
-def socketio_connect():
-    print('BlueHat Client device connected!')
-
-'''
-Description: SocketIO connect event method for BlueHat Observer Devices
-Input: None
-Return Type: Prints statement on server side when client disconnects
-'''
-@socketio.on('observer_connect')
-def bluehatObserver_socketio_connect():
-    emit('bluehat_server_response', {'data': 'BlueHat Server: You are connected'})
-    print('BlueHat Observer device connected!')
+@socketio.on('connect', namespace='/Observer')
+def observer_socketio_connect():
+    print('BlueHat Observer Device connected!')
 
 
 '''
@@ -60,16 +50,16 @@ Description: SocketIO discconect event method for any client
 Input: None
 Return Type: Prints statement on server side when client disconnects
 '''
-@socketio.on('disconnect')
+@socketio.on('disconnect', namespace='/Observer')
 def socketio_disconnect():
-    print('BlueHat Client disconnected!')
+    print('BlueHat Observer Device disconnected!')
 
 '''
 Description: SocketIO event method that handles messages sent BlueHat Observer devices
 Input: None
 Return Type: None
 '''
-@socketio.on('observer_json_msg')
+@socketio.on('observer_json_msg', namespace='/Observer')
 def handleObserverMessage(json_data):
     print json_data
-    emit('bluehat_server_response', json_data)
+    emit('observer_json_msg', json_data)
