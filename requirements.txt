@@ -15,6 +15,7 @@ greenlet==0.4.12
 gunicorn==19.7.1
 itsdangerous==0.24
 Jinja2==2.9.6
+logging==0.4.9.6
 Mako==1.0.6
 MarkupSafe==1.0
 packaging==16.8
@@ -26,7 +27,6 @@ python-engineio==1.4.0
 python-socketio==1.7.4
 requests==2.14.2
 six==1.10.0
-socketIO-client==0.7.2
 SQLAlchemy==1.1.9
 websocket-client==0.40.0
 Werkzeug==0.12.1
