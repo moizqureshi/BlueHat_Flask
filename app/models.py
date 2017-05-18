@@ -10,7 +10,7 @@ class Serializer(object):
     def serialize_list(l):
         return [m.serialize() for m in l]
 
-class User(db.Model, Serializer):
+class Users(db.Model, Serializer):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
