@@ -194,7 +194,7 @@ def dropsession():
     db.session.add(user)
     db.session.commit()
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('index_view'))
 
 '''
 Description: 404 Error handling
