@@ -1,0 +1,110 @@
+{% extends "dashboard_layout.html" %}
+{% block css %}
+  {{ super() }}
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-bootgrid/1.3.1/jquery.bootgrid.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+{% endblock css %}
+{% block content %}
+<nav id="menu">
+  <header>
+    <div class="headerImg">
+      <img id="logo-img" class="animated flipInX"  src="{{ url_for('static', filename='imgs/fq_logo.png') }}">
+    </div>
+    <h2 class="menuTitle">Menu</h2>
+    <ul class="menuList">
+      <li><a class="menuItem" id="home">Home</a></li>
+      <li><a class="menuItem" id="profile">Profile</a></li>
+      <li><a class="menuItem" id="observers">Observers</a></li>
+      <li><a class="menuItem" id="advertisers">Advertisers</a></li>
+      <li><a class="menuItem" id="settings">Settings</a></li>
+      {% if admin == 1 %}
+      <li><a class="menuItem" id="analytics">Analytics</a></li>
+      {% endif %}
+      <li><a href="/logout" class="menuItem" id="settings">Logout</a></li>
+    </ul>
+  </header>
+</nav>
+<main class="panel" id="panel">
+  <header>
+    <div class="arrow right">
+      <div class="line arrow_top"></div>
+      <div class="line arrow_line"></div>
+      <div class="line arrow_bottom"></div>
+    </div>
+  </header>
+  <div class="panel_content" id="panel_content">
+  </div>
+</main>
+{% endblock  content%}
+
+{% block js %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bootgrid/1.3.1/jquery.bootgrid.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bootgrid/1.3.1/jquery.bootgrid.fa.js"></script>
+<script src="https://use.fontawesome.com/57bf013cf0.js"></script>
+<script>
+  $(document).ready(function() {
+      $("#panel_content").load("/dashboard/home");
+      $('#home').addClass('active');
+
+      $("#home").click(function() {
+        $('.active').removeClass('active');
+        $('#home').addClass('active');
+        $("#panel_content").load("/dashboard/home");
+      });
+
+      $("#profile").click(function() {
+        $('.active').removeClass('active');
+        $('#profile').addClass('active');
+        $("#panel_content").load("/dashboard/profile");
+      });
+
+      $("#observers").click(function() {
+        $('.active').removeClass('active');
+        $('#observers').addClass('active');
+        $("#panel_content").load("/dashboard/observers");
+      });
+
+      $("#advertisers").click(function() {
+        $('.active').removeClass('active');
+        $('#advertisers').addClass('active');
+        $("#panel_content").load("/dashboard/advertisers");
+      });
+
+      $("#settings").click(function() {
+        $('.active').removeClass('active');
+        $('#settings').addClass('active');
+        $("#panel_content").load("/dashboard/settings");
+      });
+
+      $("#analytics").click(function() {
+        $('.active').removeClass('active');
+        $('#analytics').addClass('active');
+        $("#panel_content").load("/dashboard/analytics");
+      });
+  });
+</script>
+<script>
+  var slideout = new Slideout({
+    'panel': document.getElementById('panel'),
+    'menu': document.getElementById('menu'),
+    'padding': 320,
+    'tolerance': 70
+  });
+  //Toggle Menu button
+  document.querySelector('.arrow').addEventListener('click', function() {
+    slideout.toggle();
+    if ($('.arrow').hasClass('right')) {
+      $('.arrow').removeClass('right');
+      $('.arrow').addClass('left');
+    } else {
+      $('.arrow').removeClass('left');
+      $('.arrow').addClass('right');
+    }
+  });
+</script>
+{% endblock js %}
