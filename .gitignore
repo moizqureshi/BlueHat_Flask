@@ -4,4 +4,3 @@
 .DS_STORE
 flask/
 flask_session/
-migrations/
