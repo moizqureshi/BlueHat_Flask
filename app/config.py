@@ -20,8 +20,7 @@ class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_ECHO = True
     SECRET_KEY = THE_SECRET_KEY
-    #DB_HOST = os.getenv('IP', '0.0.0.0')
-    # SQLALCHEMY_DATABASE_URI = "postgresql://ye_huang:@localhost:5432/bluehat"
+    SQLALCHEMY_DATABASE_URI = HEROKU_DB_URL
 
 app_config = {
     'development': DevelopmentConfig,
