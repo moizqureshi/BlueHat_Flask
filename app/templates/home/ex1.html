@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map; //Hold a google.maps.Map which is our map
+
+      //The following will hold google.maps.Marker objects
+      var centeralMarker_A; //marker for Centeral A
+      var centeralMarker_B; //marker for Centeral B
+      var peripheralMarker_A; //marker for Peripheral A
+
+      //The following hold lat/lng coordinates.
+      var park = {lat: 32.869621, lng: -117.200714}; //coordinates for the field
+
+      var centeral_A = {lat: 32.869841, lng: -117.200752}; //coordinates for the Centeral A
+      var centeral_B = {lat: 32.869762, lng: -117.200897}; //coordinates for the Centeral B
+      var peripheral_A = {lat: 32.869762, lng: -117.200762}; //coordinates for the Peripheral A
+
+      /**
+       * This function gets called once libraries are downloaded from the script
+       * that is directly below this script where you see "async defer".
+       * The function creates a new map and puts it into our <div> labeled "map"
+       */
+      function initMap() {
+        //Generate a new Map object, put it in "map" div
+        map = new google.maps.Map(document.getElementById('map'), {
+          //These are options when you make a Map, there are more, check documentation.
+          center: park, //Required, this is the center of our map, we give it the field coordinates
+          zoom: 20, //Required, the zoom of the field, high number = more zoom.
+          draggable: false, //False so we can't drag the map to other places
+          scrollwheel: false, //False so we can't zoom in or out with mouse scroll wheel
+          mapTypeId: google.maps.MapTypeId.SATELLITE //Shows the map as satellite, can have different view, check documentation.
+        });
+
+        //The following generate new Marker objects and puts them within the Map object.
+        centeralMarker__A = new google.maps.Marker({
+          position: centeral_A, //Position of the marker
+          map: map, //this "map" refers to the var map that is holding the Map object, NOT the div id.
+          label: "C", //Label of the marker
+        });
+
+        //Same as above.
+        centralMarker_B = new google.maps.Marker({
+          position: centeral_B,
+          map: map,
+          label: "C"
+        });
+
+        peripheralMarker_A = new google.maps.Marker({
+          position: peripheral_A,
+          map: map,
+          label: "P"
+        });
+      }
+      /**
+       * To change the position of a Peripheral, first take the var that is holding
+       * the Marker object of the Peripheral you want to move and then call the .setPosition( )
+       * function on it and give it the new lat/lng coordinates as parameters to move it.
+       * Below is a little example.
+       */
+
+      //Disgard the following, this was just a way for me to test that marker changes position
+      /*
+      var counter = 0;
+      function change( ) {
+        if (counter == 0)
+          peripheralMarker_A.setPosition( {lat: 32.869762, lng: -117.200762} );
+        else if (counter == 1)
+          peripheralMarker_A.setPosition( {lat: 32.869695,lng: -117.200762} );
+        else
+          peripheralMarker_A.setPosition( {lat: 32.869534,lng: -117.200764} );
+        counter = (counter + 1) % 3;
+      }*/
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?callback=initMap"
+    async defer></script>
+    <!--> <button onclick="change()">change me</button> <!-->
+  </body>
+</html>
