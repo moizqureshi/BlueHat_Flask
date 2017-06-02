@@ -41,6 +41,9 @@ app.config['CDN_DEBUG'] = True
 # DB Config
 db.init_app(app)
 
+# REDIS Config
+redis_store = FlaskRedis(app)
+
 # Migration Config
 migration = Migrate(app, db)
 

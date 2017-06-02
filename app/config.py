@@ -14,6 +14,7 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
     SECRET_KEY = THE_SECRET_KEY
     SQLALCHEMY_DATABASE_URI = "postgres://" + DB_USER + ":" + DB_PASS + "@localhost/" + DB_NAME
+    REDIS_URL = "redis://:" + REDIS_PASS + "@localhost:6379/0"
 
 # Production configurations
 class ProductionConfig(Config):
