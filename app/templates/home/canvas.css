@@ -1,0 +1,19 @@
+canvas {
+  background-color: transparent;
+  border: 1px solid #000000 ;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.mainMap {
+  z-index: 0;
+}
+
+.centeralsMap {
+  z-index: 1;
+}
+
+#canvasHolder {
+  position: relative;
+}

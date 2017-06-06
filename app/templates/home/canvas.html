@@ -1,0 +1,106 @@
+<!DOCTYPE>
+<html>
+<head> </head>
+<body>
+<div id="cvs" style="position:relative;">
+  <canvas id="mapCanvas" width="640" height="640" style="border:1px solid #000000; background-color:transparent;
+  position: absolute; left: 0; top: 0; z-index: 0;">
+  </canvas>
+
+  <canvas id="CenteralCanvas" width="640" height="640" style="position:absolut; left:0; top:0; z-index:0;">
+  </canvas>
+
+  <canvas id = "PeripheralCanvas1" width="640" height="640" style="position: absolute; left: 0; top: 0; z-index: 1;">
+  </canvas>
+
+  <canvas id = "PeripheralCanvas2" width="640" height="640" style="position: absolute; left: 0; top: 0; z-index: 2;">
+  </canvas>
+
+</div>
+  <script src="canvas.js"> </script>
+  <script>
+  //8 pixel = 1 foot
+  var canvas_A_id = "mapCanvas";
+  var canvas_B_id = "CenteralCanvas";
+  var canvas_C_id = "PeripheralCanvas";
+  var canvas_C_length = document.getElementsByTagName("canvas").length - 2;
+
+  var polygon = [
+    [100,40],
+    [257, 156],
+    [357, 150],
+    [340, 253],
+    [66, 347]
+  ];
+
+  var centerals = [
+    [125, 150],
+    [245, 255],
+    [300, 200]
+  ];
+  var peripherals = [
+      [160, 243],
+      [333, 175]
+  ];
+
+  var canvas_A = new Canvas(document.getElementById(canvas_A_id));
+  canvas_A.drawMap(polygon);
+
+  var canvas_B = new Canvas(document.getElementById(canvas_B_id));
+  canvas_B.addMarkerList(centerals);
+
+  var canvas_C = [];
+
+  for( i = 0; i < canvas_C_length; i++ ) {
+    console.log(canvas_C_id +""+ (i+1));
+    canvas_C.push( new Canvas(document.getElementById(canvas_C_id +""+ (i+1))));
+    canvas_C[i].setColor("#FF0000");
+    canvas_C[i].addMarkerCoor(peripherals[i]);
+  }
+
+/*
+  function drawMarker() {
+    var x = parseFloat(document.getElementById("x").value);
+    var y = parseFloat(document.getElementById("y").value);
+    canvas.addMarker(x, y);
+  }
+
+  function removeMarker() {
+    var x = parseFloat(document.getElementById("x").value);
+    var y = parseFloat(document.getElementById("y").value);
+    canvas.clearMarker(x, y);
+  }
+
+  var tempX = 150, tempY = 150;
+*/
+  function move() {
+    console.log("calling move");
+    for( i = 0; i < canvas_C_length; i++) {
+      console.log(i);
+      canvas_C[i].clearMarker();
+      canvas_C[i].x += 10;
+      canvas_C[i].y += 10;
+      canvas_C[i].addMarkerInner();
+    }
+  }
+
+  var inter;
+
+  function startStim() {
+    inter = setInterval(function(){move();},2000);
+  }
+
+  function endStim() {
+    clearInterval(inter);
+  }
+  </script>
+
+<input id="x" style=></input>
+<input id="y"></input>
+<button onclick="drawMarker()">CREATE</button>
+<button onclick="removeMarker()">REMOVE</button>
+<button onclick="startStim()">Start Stimulation</button>
+<button onclick="endStim()">End Stimulation</button>
+
+</body>
+</html>
