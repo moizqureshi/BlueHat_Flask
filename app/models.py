@@ -56,21 +56,22 @@ class Central(db.Model, Serializer):
     __tablename__ = 'centrals'
 
     id = db.Column(db.Integer, primary_key=True)
-    device_UUID = db.Column(db.Integer, nullable=False)
+    device_UUID = db.Column(db.String(20), nullable=False)
     locationName = db.Column(db.String(20), index=True, nullable=False)
-    locationLatLong = db.Column(db.String(40), index=True, nullable=False)
+    xCoord = db.Column(db.Integer, index=True, nullable=False)
+    yCoord = db.Column(db.Integer, index=True, nullable=False)
 
-
-    def __init__(self, device_UUID, locationName, locationLatLong):
+    def __init__(self, device_UUID, locationName, xCoord, yCoord):
         self.device_UUID = device_UUID
         self.locationName = locationName
-        self.locationLatLong = locationLatLong
+        self.xCoord = xCoord
+        self.yCoord = yCoord
 
 class Peripheral(db.Model, Serializer):
     __tablename__ = 'peripherals'
 
     id = db.Column(db.Integer, primary_key=True)
-    device_UUID = db.Column(db.Integer, nullable=False)
+    device_UUID = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __init__(self, device_UUID, user_id):

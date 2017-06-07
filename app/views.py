@@ -221,7 +221,55 @@ def error_401(errCode, msg):
     return resp
 
 '''
-Description: SocketIO connect event method for all clients
+Description: SocketIO connect event method for browser clients
+Input: None
+Return Type: Prints statement on server side when client connects
+'''
+@socketio.on('connect')
+def browser_socketio_connect():
+    print('BlueHat browser client connected!')
+
+'''
+Description: SocketIO disconnect event method for browser clients
+Input: None
+Return Type: Prints statement on server side when client disconnects
+'''
+@socketio.on('disconnect')
+def browser_socketio_disconnect():
+    print('BlueHat browser client disconnected!')
+
+'''
+Description: SocketIO register observer event method for browser clients
+Input: Observer Device data to register itself
+Return Type: None
+'''
+@socketio.on('register_observer')
+def browser_socketio_registerObserver(data):
+    print(data)
+    deviceId = data['observerId']
+    locationName = data['location']
+    xCoord = int(data['xCoord'])
+    yCoord = int(data['yCoord'])
+    newObserver = Central(device_UUID=deviceId, locationName=locationName, xCoord=xCoord, yCoord=yCoord)
+    db.session.add(newObserver)
+    db.session.commit()
+
+'''
+Description: SocketIO register advertiser event method for browser clients
+Input: Advertiser Device data to register itself
+Return Type: None
+'''
+@socketio.on('register_advertiser')
+def browser_socketio_registerAdvertiser(data):
+    print(data)
+    deviceId = data['advertiserId']
+    user = Users.query.filter_by(email=data['advertiserEmail']).first()
+    newAdvertiser = Peripheral(device_UUID=deviceId, user_id=user.id)
+    db.session.add(newAdvertiser)
+    db.session.commit()
+
+'''
+Description: SocketIO connect event method for Observer clients
 Input: None
 Return Type: Prints statement on server side when client connects
 '''
@@ -246,5 +294,4 @@ Return Type: None
 @socketio.on('observer_json_msg', namespace='/observer')
 def handleObserverMessage(json_data):
     print json_data
-    
     emit('on_server_response', json_data)

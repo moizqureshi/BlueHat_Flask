@@ -8,33 +8,33 @@
     <div class="col-sm-4">
       <h4>Add HardHat Device:</h4>
       <div class="panel panel-default">
-        <form class="panel-body form-horizontal">
+        <div class="panel-body form-horizontal">
           <div class="form-group">
             <label class="col-sm-5 control-label">HardHat ID</label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" id="concept" name="concept">
+              <input type="text" class="form-control" id="advertiserIdText" name="advertiserId">
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-5 control-label">Name</label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" id="concept" name="concept">
+              <input type="text" class="form-control" id="advertiserNameText" name="advertiserName">
             </div>
           </div>
           <div class="form-group">
             <label for="description" class="col-sm-5 control-label">Email</label>
             <div class="col-sm-8">
-              <input type="number" class="form-control" id="description" name="x_coordinate">
+              <input type="text" class="form-control" id="advertiserEmailText" name="advert">
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-4 col-sm-4">
-              <button type="button" class="btn btn-default preview-add-button">
+              <button id="addAdvertiserBtn" type="button" class="btn btn-default preview-add-button">
                 <span class="glyphicon glyphicon-plus"></span> Add
               </button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
     <!-- / panel preview -->
@@ -46,7 +46,7 @@
             <table class="table preview-table">
               <thead>
                 <tr>
-                  <th>Central Device ID</th>
+                  <th>HardHat Device ID</th>
                   <th>Name</th>
                   <th>Email</th>
                 </tr>

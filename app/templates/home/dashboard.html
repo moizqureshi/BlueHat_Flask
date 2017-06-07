@@ -45,51 +45,94 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bootgrid/1.3.1/jquery.bootgrid.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bootgrid/1.3.1/jquery.bootgrid.fa.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script src="https://use.fontawesome.com/57bf013cf0.js"></script>
 <script>
   $(document).ready(function() {
-      $("#panel_content").load("/dashboard/home");
+    var socket = io.connect('http://localhost:8000');
+    // var socket = io.connect('https://bluehat.herokuapp.com');
+
+    socket.on('connect', function(){
+      console.log('Connected to BluHat Server');
+    });
+
+    $('#logout').on('click', function(){
+      socket.disconnect();
+      console.log("Disconnected from BlueHat Server");
+    });
+
+    socket.on('bluehat_server_msg', function(data) {
+      console.log("Received data from server: ", data);
+    });
+
+    $("#panel_content").load("/dashboard/home");
+    $('#home').addClass('active');
+
+    $("#home").click(function() {
+      $('.active').removeClass('active');
       $('#home').addClass('active');
+      $("#panel_content").load("/dashboard/home");
+    });
 
-      $("#home").click(function() {
-        $('.active').removeClass('active');
-        $('#home').addClass('active');
-        $("#panel_content").load("/dashboard/home");
-      });
+    $("#profile").click(function() {
+      $('.active').removeClass('active');
+      $('#profile').addClass('active');
+      $("#panel_content").load("/dashboard/profile");
+    });
 
-      $("#profile").click(function() {
-        $('.active').removeClass('active');
-        $('#profile').addClass('active');
-        $("#panel_content").load("/dashboard/profile");
-      });
+    $("#observers").click(function() {
+      $('.active').removeClass('active');
+      $('#observers').addClass('active');
+      $("#panel_content").load("/dashboard/observers");
+    });
 
-      $("#observers").click(function() {
-        $('.active').removeClass('active');
-        $('#observers').addClass('active');
-        $("#panel_content").load("/dashboard/observers");
-      });
+    $("#advertisers").click(function() {
+      $('.active').removeClass('active');
+      $('#advertisers').addClass('active');
+      $("#panel_content").load("/dashboard/advertisers");
+    });
 
-      $("#advertisers").click(function() {
-        $('.active').removeClass('active');
-        $('#advertisers').addClass('active');
-        $("#panel_content").load("/dashboard/advertisers");
-      });
+    $("#settings").click(function() {
+      $('.active').removeClass('active');
+      $('#settings').addClass('active');
+      $("#panel_content").load("/dashboard/settings");
+    });
 
-      $("#settings").click(function() {
-        $('.active').removeClass('active');
-        $('#settings').addClass('active');
-        $("#panel_content").load("/dashboard/settings");
-      });
+    $("#analytics").click(function() {
+      $('.active').removeClass('active');
+      $('#analytics').addClass('active');
+      $("#panel_content").load("/dashboard/analytics");
+    });
 
-      $("#analytics").click(function() {
-        $('.active').removeClass('active');
-        $('#analytics').addClass('active');
-        $("#panel_content").load("/dashboard/analytics");
-      });
+    $(document.body).on('click', '#addObserverBtn', function() {
+      var observerId = $('#observerIdText').val();
+      var location = $('#observerLocationText').val();
+      var xCoord = $('#observerX-CoordText').val();
+      var yCoord = $('#observerY-CoordText').val();
+      if (observerId && location && xCoord && yCoord) {
+        data = {
+          'observerId': observerId,
+          'location': location,
+          'xCoord': xCoord,
+          'yCoord': yCoord
+        }
+        console.log(data);
+        socket.emit('register_observer', data);
+      }
+    });
 
-      $("#addObserverBtn").click(function() {
-        // var observerId =
-      });
+    $(document.body).on('click', '#addAdvertiserBtn', function() {
+      var advertiserId = $('#advertiserIdText').val();
+      var advertiserName = $('#advertiserNameText').val();
+      var advertiserEmail = $('#advertiserEmailText').val();
+      data = {
+        'advertiserId': advertiserId,
+        'advertiserName': advertiserName,
+        'advertiserEmail': advertiserEmail,
+      }
+      console.log(data);
+      socket.emit('register_advertiser', data);
+    });
   });
 </script>
 <script>
