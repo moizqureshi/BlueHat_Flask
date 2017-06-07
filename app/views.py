@@ -333,20 +333,21 @@ def handleObserverMessage(json_data):
         json_data = {}
         for DeviceID in DeviceID_List:
             data = redis.zrange(DeviceID, 0, 2, withscores=True)
-            centralA = getObserverCoords(data[0][0])
-            distA = data[0][1]
-            centralB = getObserverCoords(data[1][0])
-            distB = data[1][1]
-            centralC = getObserverCoords(data[2][0])
-            distC = data[2][1]
-            location = estimateLocation(centralA, centralB, centralC, distA, distB, distC)
-            json_data = {
-                'deviceID': DeviceID,
-                'xCoord': location[0],
-                'yCoord': location[1]
-            }
-            json_list.append(json_data)
-        socketio.emit('hardhat_position', json_data)
+            if len(data) > 2:
+                centralA = getObserverCoords(data[0][0])
+                distA = data[0][1]
+                centralB = getObserverCoords(data[1][0])
+                distB = data[1][1]
+                centralC = getObserverCoords(data[2][0])
+                distC = data[2][1]
+                location = estimateLocation(centralA, centralB, centralC, distA, distB, distC)
+                json_data = {
+                    'deviceID': DeviceID,
+                    'xCoord': location[0],
+                    'yCoord': location[1]
+                }
+                json_list.append(json_data)
+            socketio.emit('hardhat_position', json_data)
 
 def getObserverCoords(observerID):
     if observerID == '1':
