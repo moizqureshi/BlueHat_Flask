@@ -2,8 +2,6 @@
 # BlueHat Flask Views
 ''' =========================================================================================== '''
 # Imports
-import requests
-import json
 from app import app, models, socketio, login_manager
 from app.models import *
 from app import db
@@ -14,11 +12,15 @@ from flask_socketio import SocketIO, Namespace, send, emit, disconnect
 from datetime import datetime
 from datetime import timedelta
 from functools import update_wrapper
-
+from box import Box
 from sqlalchemy import *
 from sqlalchemy.sql import func
 from passlib.hash import sha256_crypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_redis import Redis
+import requests
+import json
+import jsonpickle
 
 ''' =========================================================================================== '''
 # BlueHat Web Routes
@@ -244,4 +246,5 @@ Return Type: None
 @socketio.on('observer_json_msg', namespace='/observer')
 def handleObserverMessage(json_data):
     print json_data
+    
     emit('on_server_response', json_data)

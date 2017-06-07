@@ -67,10 +67,11 @@ body {
 
 .menuItem {
   color: white !important;
+  cursor: pointer
 }
 
 .menuItem:hover, .menuItem.active {
-  color: white !important;
+  color: #7EAFC2 !important;
   text-decoration: none;
 }
 

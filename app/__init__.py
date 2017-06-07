@@ -11,6 +11,7 @@ from flask_socketio import SocketIO
 from flask_login import LoginManager
 from flask_compress import Compress
 from flask_cdn import CDN
+from flask_redis import Redis
 
 # Socket Init Setting
 async_mode = "eventlet"
@@ -40,6 +41,8 @@ app.config['CDN_DEBUG'] = True
 
 # DB Config
 db.init_app(app)
+redis = Redis()
+redis.init_app(app)
 
 # Migration Config
 migration = Migrate(app, db)
