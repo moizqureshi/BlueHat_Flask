@@ -34,6 +34,13 @@
     </div>
   </header>
   <div class="panel_content" id="panel_content">
+    <h2>BlueHat Dashboard</h2>
+    <div class="canvasHolder">
+      <canvas id="mainMap" width="640" height="640">  </canvas>
+
+      <canvas id="centeralsMap" width="640" height="640">  </canvas>
+
+    </div>
   </div>
 </main>
 {% endblock  content%}
@@ -65,7 +72,6 @@
       console.log("Received data from server: ", data);
     });
 
-    $("#panel_content").load("/dashboard/home");
     $('#home').addClass('active');
 
     $("#home").click(function() {
@@ -133,7 +139,263 @@
       console.log(data);
       socket.emit('register_advertiser', data);
     });
-  });
+
+    //Necessary initializing steps
+    var mapCoordinates = [ //Polygon coordinates
+      [10, 40],
+      [100, 40],
+      [350, 250],
+      [550, 364],
+      [420, 420],
+      [222, 345]
+    ];
+
+    var centeralsCoordinates = [ //Centeral devices coordinates
+      [75, 75],
+      [250, 250],
+      [400, 300]
+    ];
+
+    //Draws the polygon
+    var temp = new Canvas(document.getElementById("mainMap"));
+    temp.drawMap(mapCoordinates);
+
+    //Draw the centerals in red
+    temp = new Canvas(document.getElementById("centeralsMap"));
+    temp.setColor("#FF0000");
+    temp.addMarkerList(centeralsCoordinates);
+
+    // Array of mocked JSON
+    var JSONs = [
+    '{ "peripherals":[' +
+    '{ "personName":"Moiz Qureshi", "x_coord":15, "y_coord":32 },' +
+    '{ "personName":"Ye Huange", "x_coord":50, "y_coord": 24 },' +
+    '{ "personName":"Ben Chafik", "x_coord":100, "y_coord": 100},' +
+    '{ "personName":"Eduardo Rosales", "x_coord":200, "y_coord": 178}' +
+    ']}',
+
+    '{"peripherals":[' +
+    '{ "personName":"Moiz Qureshi", "x_coord":20, "y_coord":32 },' +
+    '{ "personName":"Ye Huange", "x_coord":55, "y_coord": 30 },' +
+    '{ "personName":"Ben Chafik", "x_coord":125, "y_coord": 110 },' +
+    '{ "personName":"Eduardo Rosales", "x_coord":205, "y_coord": 180 }' +
+    ']}',
+
+    '{"peripherals":[' +
+    '{ "personName":"Moiz Qureshi", "x_coord":25, "y_coord":35 },' +
+    '{ "personName":"Ye Huange", "x_coord":55, "y_coord": 30 },' +
+    '{ "personName":"Ben Chafik", "x_coord":128, "y_coord": 111 },' +
+    '{ "personName":"Eduardo Rosales", "x_coord":215, "y_coord": 190 }' +
+    ']}',
+
+    '{"peripherals":[' +
+    '{ "personName":"Moiz Qureshi", "x_coord":30, "y_coord":38 },' +
+    '{ "personName":"Ye Huange", "x_coord":56, "y_coord": 32 },' +
+    '{ "personName":"Ben Chafik", "x_coord":130, "y_coord": 115 },' +
+    '{ "personName":"Eduardo Rosales", "x_coord":230, "y_coord": 210 }' +
+    ']}',
+  ];
+
+  /*
+   * Whatever is in this function is what needs to go in socket.on function
+   * This function takes on one single JSON not an array os JSONs.
+   * EzPz.
+   */
+  function socketio(single_json) {
+    //Parse the JSON object
+    var parsed_json = JSON.parse(single_json);
+
+    //Go through each peripheral within the JSON
+    for( i = 0; i < parsed_json.peripherals.length; i++) {
+      //check if the peripheral is new
+      if(isPeriNew(parsed_json.peripherals[i].personName)) {
+        //if it is, add a new canvas tag for it and save the name id of that.
+        var canvas_name = canvasAdder(parsed_json.peripherals[i].personName);
+        //then add the canvas JS and draw a point at x and y
+        addPeri(parsed_json.peripherals[i].personName, canvas_name, parsed_json.peripherals[i].x_coord, parsed_json.peripherals[i].y_coord);
+      }
+
+      else //if the peripheral is not new then update it no matter what.
+        updatePeri(parsed_json.peripherals[i].personName, parsed_json.peripherals[i].x_coord, parsed_json.peripherals[i].y_coord);
+    } //updating no matter what saves us time by not iterating through a list to check who has moved or not and isntead just do a O(n) and update everyone.
+  }
+
+  /*
+   * This function uses jQuerry and adds a new canvas tag inside the canvasHolder div.
+   * The problem is with z-axis, if we implement deleting peripherals, I would need to
+   * change the z-axis somehow. Without deleting, this should work just fine.
+   */
+  function canvasAdder(personName) {
+    //construct the id of the canvas, it's always: "peri" + the name of the person without space
+    var canvas_name = "peri" + ((personName).replace(/\s/g, '')); //for exampe if peripheral name is "Ben Chafik" then the id of the new canvas tag is: "periBenChafik"
+
+    //getting zaxis by counting how many canvas tags we have so far so we know where to stack this new tag
+    var zaxis = document.getElementsByTagName("canvas").length;
+
+    //Finishing and adding the entire tag together with options etc.
+    var canv = "<canvas id=" + canvas_name + " width=\"640\" height=\"640\" style=\"z-index: " + zaxis+ "\">  </canvas>";
+
+    //Using jQuerry to add this new tag.
+    $(".canvasHolder").append(canv);
+
+    //return the id of the new tag
+    return canvas_name;
+  }
+
+
+  //All this below was just used to stimulate and test the functions above, you can delete.
+  var counter = 0;
+
+  function runner() {
+    console.log(counter);
+    //gives a JSON to socketio function.
+    socketio(JSONs[counter]);
+    counter = (counter + 1) % 4;
+  }
+
+  //Run "runner()" every 2seconds.
+  setInterval(function(){runner();}, 2000);
+  //Custom Canvas Object to hold all we need and make it easy
+  function Canvas(tag) {
+    this.drawable = tag.getContext("2d"); //holds the canvas
+    this.init = init;
+    this.addMarkerXY = addMarkerXY;
+    this.addMarkerInner = addMarkerInner;
+    this.clearMarkerXY = clearMarkerXY;
+    this.clearMarker = clearMarker;
+    this.drawMap = drawMap;
+    this.addMarkerList = addMarkerList;
+    this.addMarkerCoor = addMarkerCoor
+    this.setColor = setColor;
+    this.color = "#000000"; //holds the color to draw with
+    this.x = 0; //holds the last X coordinate
+    this.y = 0; //holds the last Y coordinate
+  }
+
+  /*
+   * Takes in a list of coordinates like [[x1,y1], [x2,y2]]
+   * and draw a polygon by iterating through the coordinates
+   * drawing points and lines between the points
+   */
+  function drawMap(map) {
+    this.drawable.strokeStyle = '#000000';
+    for( i = 0; i < map.length; i++) {
+      var x = map[i][0];
+      var y = map[i][1];
+
+      if( i > 0)
+        this.drawable.lineTo(x, y)
+
+      this.addMarkerXY(x, y);
+      this.drawable.moveTo(x, y);
+    }
+    this.drawable.lineTo(map[0][0], map[0][1]);
+    this.drawable.stroke();
+  }
+
+  //atm this is unused.
+  function init(tag) {
+    this.drawable = tag.getContext("2d");
+  }
+
+  /*
+   * Adds a marker at position (x,y) and saves x and y
+   * internally a.k.a in this.x and this.y
+   */
+  function addMarkerXY(x, y) {
+    console.log("x = " + x + " y = " + y + " color = " + this.color);
+    this.x = x;
+    this.y = y;
+    this.drawable.strokeStyle = this.color;
+    this.drawable.strokeRect(x,y,1,1);
+  }
+
+  /*
+   * Adds a marker at position (this.x, this.y)
+   */
+  function addMarkerInner( ) {
+    this.addMarkerXY(this.x, this.y);
+  }
+
+  /*
+   * Adds a lot of markers from a list of coordinates
+   * this is different from drawMap because it doesn't draw
+   * any lines.
+   */
+  function addMarkerList(coordinateList) {
+    for( i = 0; i < coordinateList.length; i++)
+      this.addMarkerXY(coordinateList[i][0], coordinateList[i][1]);
+  }
+
+  /*
+   * This functions received a single list of 2 entries
+   * and makes a marker off of the 0th and 1st where [0] is x
+   * and [1] is y
+   */
+  function addMarkerCoor(coordinates) {
+    this.addMarkerXY(coordinates[0], coordinates[1]);
+  }
+
+  /*
+   * removes a marker at position x, y
+   */
+  function clearMarkerXY(x, y) {
+    //causes no error if x or y is 0
+    this.drawable.clearRect(x-1,y-1,3,3);
+  }
+
+  /*
+   * remove the marker at position (this.x, this.y)
+   */
+  function clearMarker() {
+    this.clearMarkerXY(this.x, this.y);
+  }
+
+  /*
+   * sets the color to draw with
+   */
+  function setColor(color) {
+    this.color = color;
+  }
+
+  //Holds a dictionary of: (peripheral person name, the peripheral's own Custom Canvas object)
+  var peripherals = new Map();
+
+  /*
+   * Checks if we have a peripheral Canvas object associated with a peripheral name
+   * passed in. Send true/false accordingly
+   */
+  function isPeriNew(periName) {
+    //Checks in the map with the key
+    if (peripherals.get(periName) === undefined){
+      return true;
+    }
+    return false;
+  }
+
+  /*
+   * Makes a new Canvas object, draw a mark at (x, y)
+   * in the Canvas and then add this new object to the map
+   * and associate it with the peripheral name
+   */
+  function addPeri(periName, periCanvasId, x, y) {
+    var periCanvas = new Canvas(document.getElementById(periCanvasId));
+    periCanvas.addMarkerXY(x, y);
+    peripherals.set(periName, periCanvas);
+  }
+
+  /*
+   * This simply gets a Canvas object from the dictionary
+   * with the peripheral person name as the key then
+   * remove the existing marker and create a new one
+   * at (x, y)
+   */
+  function updatePeri(periName, x, y) {
+    var periCanvas = peripherals.get(periName);
+    periCanvas.clearMarker();
+    periCanvas.addMarkerXY(x, y);
+  }
+});
 </script>
 <script>
   var slideout = new Slideout({
@@ -154,4 +416,5 @@
     }
   });
 </script>
+
 {% endblock js %}

@@ -10,7 +10,7 @@ class KalmanFilter(object):
         self.covariance = None
         self.estimate = None
 
-    def filter(self, measurement, control):
+    def filter(self, measurement, control=1):
         if (self.estimate is None):
             self.estimate = (1 / self.measurementVector) * measurement
             self.covariance = (1 / self.measurementVector) * self.measurementNoise * (1 / self.measurementVector)

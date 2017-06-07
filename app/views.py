@@ -2,7 +2,8 @@
 # BlueHat Flask Views
 ''' =========================================================================================== '''
 # Imports
-from app import app, models, socketio, login_manager
+from app import app, models, socketio, login_manager, redis
+from app.KalmanFilter import KalmanFilter
 from app.models import *
 from app import db
 from env import *
@@ -21,12 +22,26 @@ from flask_redis import Redis
 import requests
 import json
 import jsonpickle
+import time
+import math
 
 ''' =========================================================================================== '''
 # BlueHat Web Routes
 
 login_manager.login_view = "index_view"
 
+# Advertiser: (aa - Index i = 0), (bb - Index i = 1), (cc - Index i = 2)
+# Observer: (1 - Index j = 0), (2 - Index j = 1), (3 - Index j = 2), (4 - Index j = 3), (5 - Index j = 4)
+# kalmanFilterArr = [[KalmanFilter(processNoise=0.008, measurementNoise=3) for i in range(3)] for j in range(5)]
+kalmanFilterB1 = KalmanFilter(processNoise=0.008, measurementNoise=3.5)
+kalmanFilterC1 = KalmanFilter(processNoise=0.008, measurementNoise=3.5)
+rssi_ref = -53.4
+
+# PUT CONSTANT OBSERVER LOCATIONS COORDS HERE
+DeviceID_List = ['bbbbbbbb', 'cccccccc']
+ObserverLocation = [(0, 0), (0, 0), (0, 0), (0, 0)]
+
+timePrev = 0
 
 @login_manager.user_loader
 def load_user(user_email):
@@ -267,6 +282,7 @@ def browser_socketio_registerAdvertiser(data):
     newAdvertiser = Peripheral(device_UUID=deviceId, user_id=user.id)
     db.session.add(newAdvertiser)
     db.session.commit()
+    redis.sadd(deviceId, data['advertiserName'])
 
 '''
 Description: SocketIO connect event method for Observer clients
@@ -293,5 +309,129 @@ Return Type: None
 '''
 @socketio.on('observer_json_msg', namespace='/observer')
 def handleObserverMessage(json_data):
-    print json_data
-    emit('on_server_response', json_data)
+    json_data = json.loads(json_data)
+    for reading in json_data:
+        reading = Box(reading)
+        # observerKalmanIdx = int(reading.ObserverID)
+        # advertiserKalmanIdx = 0
+        filteredRSSI = 0
+        print reading.DeviceID
+        if reading.DeviceID is 'aaaaaaaa':
+            print 'boo'
+        elif reading.DeviceID == 'bbbbbbbb':
+            filteredRSSI = kalmanFilterB1.filter(reading.RSSI)
+        elif reading.DeviceID == 'cccccccc':
+            filteredRSSI = kalmanFilterC1.filter(reading.RSSI)
+        distance = int(calcDistanceFris(filteredRSSI))
+        print ('%s, %d, %d, %d') % (reading.DeviceID, filteredRSSI, reading.RSSI, distance)
+        # distance = calcDistancePowerFit(filteredRSSI)
+        redis.zadd(reading.DeviceID, distance, reading.ObserverID)
+    timeNow = int(time.time())
+    timeDelta = timeNow - timePrev
+    if timePrev is 0 or timeDelta > 1:
+        json_list = []
+        json_data = {}
+        for DeviceID in DeviceID_List:
+            data = redis.zrange(DeviceID, 0, 2, withscores=True)
+            centralA = getObserverCoords(data[0][0])
+            distA = data[0][1]
+            centralB = getObserverCoords(data[1][0])
+            distB = data[1][1]
+            centralC = getObserverCoords(data[2][0])
+            distC = data[2][1]
+            location = estimateLocation(centralA, centralB, centralC, distA, distB, distC)
+            json_data = {
+                'deviceID': DeviceID,
+                'xCoord': location[0],
+                'yCoord': location[1]
+            }
+            json_list.append(json_data)
+        socketio.emit('hardhat_position', json_data)
+
+def getObserverCoords(observerID):
+    if observerID == '1':
+        return ObserverLocation[0]
+    elif observerID == '2':
+        return ObserverLocation[0]
+    elif observerID == '3':
+        return ObserverLocation[0]
+    elif observerID == '4':
+        return ObserverLocation[0]
+
+def calcDistanceFris(filteredRSSI):
+    pathLoss = 2
+    if filteredRSSI < -64.6:
+        pathLoss = 2.2
+    rssiDelta = rssi_ref - filteredRSSI
+    fraction = rssiDelta / (10 * pathLoss)
+    return math.pow(10, fraction)
+
+def calcDistancePowerFit(filteredRSSI):
+    multiplier = 0.8038093
+    power = 11.5906746
+    intercept = 0.5299515
+    ratio = filteredRSSI / rssi_ref
+    dist = (multiplier * math.pow(ratio, power)) + intercept
+    return dist
+
+# Return the distance between two given points
+# Points are given by coordinates as tuples, i.e.(x,y)
+def distance(point1, point2):
+    return math.sqrt((point2[0]-point1[0])**2 + (point2[1]-point1[1])**2)
+
+# Helper function of calculating the Intersection for CASE3 which
+# is the general case that two circles have intersections
+def getGeneralIntersect(circleA, circleB, toCompare, dist1, dist2):
+    dSqr = ((circleB[0]-circleA[0])**2 + (circleB[1]-circleA[1])**2)
+    K = (0.25) * (math.sqrt(((dist1+dist2)**2 - dSqr) * (dSqr - (dist1-dist2)**2)))
+
+    x1 = ((0.5)*(circleB[0] + circleA[0]) + (1/2)*(circleB[0] - circleA[0])*(dist1**2 - dist2**2)/dSqr) + (2*(circleB[1]-circleA[1])*K/dSqr)
+    x2 = ((0.5)*(circleB[0] + circleA[0]) + (1/2)*(circleB[0] - circleA[0])*(dist1**2 - dist2**2)/dSqr) - (2*(circleB[1]-circleA[1])*K/dSqr)
+    y1 = ((0.5)*(circleB[1] + circleA[1]) + (1/2)*(circleB[1] - circleA[1])*(dist1**2 - dist2**2)/dSqr) - (2*(circleB[0]-circleA[0])*K/dSqr)
+    y2 = ((0.5)*(circleB[1] + circleA[1]) + (1/2)*(circleB[1] - circleA[1])*(dist1**2 - dist2**2)/dSqr) + (2*(circleB[0]-circleA[0])*K/dSqr)
+
+    point1 = (x1, y1)
+    point2 = (x2, y2)
+
+    # pick the point that closer to the third point
+    if(distance(point1, toCompare) <= distance(point2, toCompare)):
+        return point1
+    else:
+        return point2
+
+# Get the intersections given two centrals and distances
+# Return the intersection by coordinate as tuples, i.e.(x,y)
+def getIntersect(center1, center2, centerToCompare, dist1, dist2):
+    # CASE 1: if one circle is inside the other
+    if(dist1 > distance(center1, center2) + dist2):
+        while(dist1 > distance(center1, center2) + dist2):
+            dist2 += 1
+        return getGeneralCaseIntersect(center2, center1, centerToCompare, dist1, dist2)
+    elif(dist2 > distance(center1, center2) + dist1):
+        while(dist2 > distance(center1, center2) + dist1):
+            dist1 += 1
+    # CASE 2: if two circles are independent
+    elif(distance(center1, center2) > (dist1 + dist2)):
+        while(distance(center1, center2) > (dist1 + dist2)):
+            dist1 += 1
+            dist2 += 1
+    # CASE 3: else the general case that two circles have intersections
+    return getGeneralIntersect(center1, center2, centerToCompare, dist1, dist2)
+
+# Get the estimated location given the centrals and distances
+# First estimate the region that peripherial device can be contained
+# then return the center of that region by coordinates as tuples
+def estimateLocation(centralA, centralB, centralC, distA, distB, distC):
+    p1 = getIntersect(centralA, centralB, centralC, distA, distB)
+    p2 = getIntersect(centralB, centralC, centralA, distB, distC)
+    p3 = getIntersect(centralC, centralA, centralB, distC, distA)
+
+    # Check if points are the same
+    if(p1 == p2 and p2 == p3):
+        return p1
+    elif(p1 == p2 or p3 == p2):
+        return ((p1[0]+p3[0])/2, (p1[1]+p3[1])/2)
+    elif(p1 == p3):
+        return ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
+    else:
+        return ((p1[0]+p2[0]+p3[0])/3, (p1[1]+p2[1]+p3[1])/3)
