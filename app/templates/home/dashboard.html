@@ -157,6 +157,8 @@
       [400, 300]
     ];
 
+    var centeralsName = [ "Cent_A", "Cent_B", "Cent_C" ];
+
     //Draws the polygon
     var temp = new Canvas(document.getElementById("mainMap"));
     temp.drawMap(mapCoordinates);
@@ -164,62 +166,32 @@
     //Draw the centerals in red
     temp = new Canvas(document.getElementById("centeralsMap"));
     temp.setColor("#FF0000");
-    temp.addMarkerList(centeralsCoordinates);
-
-    // Array of mocked JSON
-    var JSONs = [
-    '{ "peripherals":[' +
-    '{ "personName":"Moiz Qureshi", "x_coord":15, "y_coord":32 },' +
-    '{ "personName":"Ye Huange", "x_coord":50, "y_coord": 24 },' +
-    '{ "personName":"Ben Chafik", "x_coord":100, "y_coord": 100},' +
-    '{ "personName":"Eduardo Rosales", "x_coord":200, "y_coord": 178}' +
-    ']}',
-
-    '{"peripherals":[' +
-    '{ "personName":"Moiz Qureshi", "x_coord":20, "y_coord":32 },' +
-    '{ "personName":"Ye Huange", "x_coord":55, "y_coord": 30 },' +
-    '{ "personName":"Ben Chafik", "x_coord":125, "y_coord": 110 },' +
-    '{ "personName":"Eduardo Rosales", "x_coord":205, "y_coord": 180 }' +
-    ']}',
-
-    '{"peripherals":[' +
-    '{ "personName":"Moiz Qureshi", "x_coord":25, "y_coord":35 },' +
-    '{ "personName":"Ye Huange", "x_coord":55, "y_coord": 30 },' +
-    '{ "personName":"Ben Chafik", "x_coord":128, "y_coord": 111 },' +
-    '{ "personName":"Eduardo Rosales", "x_coord":215, "y_coord": 190 }' +
-    ']}',
-
-    '{"peripherals":[' +
-    '{ "personName":"Moiz Qureshi", "x_coord":30, "y_coord":38 },' +
-    '{ "personName":"Ye Huange", "x_coord":56, "y_coord": 32 },' +
-    '{ "personName":"Ben Chafik", "x_coord":130, "y_coord": 115 },' +
-    '{ "personName":"Eduardo Rosales", "x_coord":230, "y_coord": 210 }' +
-    ']}',
-  ];
+    temp.addMarkerList(centeralsCoordinates, centeralsName);
 
   /*
    * Whatever is in this function is what needs to go in socket.on function
    * This function takes on one single JSON not an array os JSONs.
    * EzPz.
    */
-  function socketio(single_json) {
-    //Parse the JSON object
-    var parsed_json = JSON.parse(single_json);
+   function socketio(data) {
+     //Parse the JSON object
+     var parsed_data = JSON.parse(data);
 
-    //Go through each peripheral within the JSON
-    for( i = 0; i < parsed_json.peripherals.length; i++) {
-      //check if the peripheral is new
-      if(isPeriNew(parsed_json.peripherals[i].personName)) {
-        //if it is, add a new canvas tag for it and save the name id of that.
-        var canvas_name = canvasAdder(parsed_json.peripherals[i].personName);
-        //then add the canvas JS and draw a point at x and y
-        addPeri(parsed_json.peripherals[i].personName, canvas_name, parsed_json.peripherals[i].x_coord, parsed_json.peripherals[i].y_coord);
-      }
+     //Go through each peripheral within the JSON
+     for( i = 0; i < parsed_datalength; i++) {
+       //check if the peripheral is new
+       if(isPeriNew(parsed_data[i].deviceID)) {
+         //if it is, add a new canvas tag for it and save the name id of that.
+         var canvas_name = canvasAdder(parsed_data[i].deviceID);
+         var periName = "Peripheral_" + i;
+         //then add the canvas JS and draw a point at x and y
+         addPeri(parsed_data[i].deviceID, periName, canvas_name, parsed_data[i].xCoord, parsed_data[i].yCoord);
+       }
 
-      else //if the peripheral is not new then update it no matter what.
-        updatePeri(parsed_json.peripherals[i].personName, parsed_json.peripherals[i].x_coord, parsed_json.peripherals[i].y_coord);
-    } //updating no matter what saves us time by not iterating through a list to check who has moved or not and isntead just do a O(n) and update everyone.
-  }
+       else //if the peripheral is not new then update it no matter what.
+         updatePeri(parsed_data[i].deviceID, parsed_data[i].xCoord, parsed_data[i].yCoord);
+     } //updating no matter what saves us time by not iterating through a list to check who has moved or not and isntead just do a O(n) and update everyone.
+   }
 
   /*
    * This function uses jQuerry and adds a new canvas tag inside the canvasHolder div.
@@ -245,7 +217,7 @@
 
 
   //All this below was just used to stimulate and test the functions above, you can delete.
-  var counter = 0;
+  /*var counter = 0;
 
   function runner() {
     console.log(counter);
@@ -255,7 +227,8 @@
   }
 
   //Run "runner()" every 2seconds.
-  setInterval(function(){runner();}, 2000);
+  setInterval(function(){runner();}, 2000);*/
+
   //Custom Canvas Object to hold all we need and make it easy
   function Canvas(tag) {
     this.drawable = tag.getContext("2d"); //holds the canvas
@@ -362,7 +335,7 @@
    */
   function clearMarkerXY(x, y) {
     //causes no error if x or y is 0
-    this.drawable.clearRect(x-1,y-1,3,3);
+    this.drawable.clearRect(0, 0, 640, 640);
   }
 
   /*
@@ -400,9 +373,9 @@
    * in the Canvas and then add this new object to the map
    * and associate it with the peripheral name
    */
-   function addPeri(periName, periCanvasId, x, y) {
+   function addPeri(periName, displayName, periCanvasId, x, y) {
      var periCanvas = new Canvas(document.getElementById(periCanvasId));
-     periCanvas.setName(periName);
+     periCanvas.setName(displayName);
      periCanvas.addMarkerXY(x, y);
      peripherals.set(periName, periCanvas);
    }
