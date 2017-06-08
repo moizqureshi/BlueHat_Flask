@@ -33,13 +33,14 @@ login_manager.login_view = "index_view"
 # Advertiser: (aa - Index i = 0), (bb - Index i = 1), (cc - Index i = 2)
 # Observer: (1 - Index j = 0), (2 - Index j = 1), (3 - Index j = 2), (4 - Index j = 3), (5 - Index j = 4)
 # kalmanFilterArr = [[KalmanFilter(processNoise=0.008, measurementNoise=3) for i in range(3)] for j in range(5)]
+kalmanFilterA1 = KalmanFilter(processNoise=0.008, measurementNoise=3.5)
 kalmanFilterB1 = KalmanFilter(processNoise=0.008, measurementNoise=3.5)
 kalmanFilterC1 = KalmanFilter(processNoise=0.008, measurementNoise=3.5)
 rssi_ref = -53.4
 
 # PUT CONSTANT OBSERVER LOCATIONS COORDS HERE
-DeviceID_List = ['bbbbbbbb', 'cccccccc']
-ObserverLocation = [(0, 0), (0, 0), (0, 0), (0, 0)]
+DeviceID_List = ['aaaaaaaa', 'bbbbbbbb', 'cccccccc']
+ObserverLocation = [(0, 0), (0, 50), (50, 0), (50, 50)]
 
 timePrev = 0
 
@@ -282,7 +283,6 @@ def browser_socketio_registerAdvertiser(data):
     newAdvertiser = Peripheral(device_UUID=deviceId, user_id=user.id)
     db.session.add(newAdvertiser)
     db.session.commit()
-    redis.sadd(deviceId, data['advertiserName'])
 
 '''
 Description: SocketIO connect event method for Observer clients
@@ -315,9 +315,8 @@ def handleObserverMessage(json_data):
         # observerKalmanIdx = int(reading.ObserverID)
         # advertiserKalmanIdx = 0
         filteredRSSI = 0
-        print reading.DeviceID
-        if reading.DeviceID is 'aaaaaaaa':
-            print 'boo'
+        if reading.DeviceID == 'aaaaaaaa':
+            filteredRSSI = kalmanFilterA1.filter(reading.RSSI)
         elif reading.DeviceID == 'bbbbbbbb':
             filteredRSSI = kalmanFilterB1.filter(reading.RSSI)
         elif reading.DeviceID == 'cccccccc':
@@ -326,6 +325,7 @@ def handleObserverMessage(json_data):
         print ('%s, %d, %d, %d') % (reading.DeviceID, filteredRSSI, reading.RSSI, distance)
         # distance = calcDistancePowerFit(filteredRSSI)
         redis.zadd(reading.DeviceID, distance, reading.ObserverID)
+        print 'here zadd'
     timeNow = int(time.time())
     timeDelta = timeNow - timePrev
     if timePrev is 0 or timeDelta > 1:
@@ -333,6 +333,7 @@ def handleObserverMessage(json_data):
         json_data = {}
         for DeviceID in DeviceID_List:
             data = redis.zrange(DeviceID, 0, 2, withscores=True)
+            print data
             if len(data) > 2:
                 centralA = getObserverCoords(data[0][0])
                 distA = data[0][1]
@@ -347,17 +348,18 @@ def handleObserverMessage(json_data):
                     'yCoord': location[1]
                 }
                 json_list.append(json_data)
-            socketio.emit('hardhat_position', json_data)
+        print json_list
+        socketio.emit('hardhat_position', json_list)
 
 def getObserverCoords(observerID):
     if observerID == '1':
         return ObserverLocation[0]
     elif observerID == '2':
-        return ObserverLocation[0]
+        return ObserverLocation[1]
     elif observerID == '3':
-        return ObserverLocation[0]
+        return ObserverLocation[2]
     elif observerID == '4':
-        return ObserverLocation[0]
+        return ObserverLocation[3]
 
 def calcDistanceFris(filteredRSSI):
     pathLoss = 2
@@ -423,6 +425,12 @@ def getIntersect(center1, center2, centerToCompare, dist1, dist2):
 # First estimate the region that peripherial device can be contained
 # then return the center of that region by coordinates as tuples
 def estimateLocation(centralA, centralB, centralC, distA, distB, distC):
+    if (distA == 0):
+        distA = 1
+    if (distB == 0):
+        distB = 1
+    if (distC == 0):
+        distC = 1
     p1 = getIntersect(centralA, centralB, centralC, distA, distB)
     p2 = getIntersect(centralB, centralC, centralA, distB, distC)
     p3 = getIntersect(centralC, centralA, centralB, distC, distA)
