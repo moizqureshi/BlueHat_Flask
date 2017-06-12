@@ -20,6 +20,7 @@ function isPeriNew(periName) {
  */
 function addPeri(periName, periCanvasId, x, y) {
   var periCanvas = new Canvas(document.getElementById(periCanvasId));
+  periCanvas.setName(periName);
   periCanvas.addMarkerXY(x, y);
   peripherals.set(periName, periCanvas);
 }

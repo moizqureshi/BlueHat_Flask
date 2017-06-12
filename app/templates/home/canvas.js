@@ -1,6 +1,8 @@
 //Custom Canvas Object to hold all we need and make it easy
 function Canvas(tag) {
   this.drawable = tag.getContext("2d"); //holds the canvas
+  this.name = "Default Name";
+  this.setName = setName;
   this.init = init;
   this.addMarkerXY = addMarkerXY;
   this.addMarkerInner = addMarkerInner;
@@ -10,9 +12,14 @@ function Canvas(tag) {
   this.addMarkerList = addMarkerList;
   this.addMarkerCoor = addMarkerCoor
   this.setColor = setColor;
+  this.drawTriangle = drawTriangle;
   this.color = "#000000"; //holds the color to draw with
   this.x = 0; //holds the last X coordinate
   this.y = 0; //holds the last Y coordinate
+}
+
+function setName(name) {
+  this.name = name;
 }
 
 /*
@@ -29,10 +36,11 @@ function drawMap(map) {
     if( i > 0)
       this.drawable.lineTo(x, y)
 
-    this.addMarkerXY(x, y);
+    //this.addMarkerXY(x, y);
     this.drawable.moveTo(x, y);
   }
   this.drawable.lineTo(map[0][0], map[0][1]);
+  this.drawable.lineWidth = 2;
   this.drawable.stroke();
 }
 
@@ -49,8 +57,18 @@ function addMarkerXY(x, y) {
   console.log("x = " + x + " y = " + y + " color = " + this.color);
   this.x = x;
   this.y = y;
+
   this.drawable.strokeStyle = this.color;
-  this.drawable.strokeRect(x,y,1,1);
+
+  this.drawable.fillStyle = this.color;
+  this.drawable.font = "12px Arial";
+  this.drawable.fillText(this.name,x-20,y-10);
+
+  this.drawable.beginPath();
+  this.drawable.arc(x, y, 4, 0, 2*Math.PI);
+  this.drawable.fill();
+  this.drawable.stroke();
+  //this.drawable.strokeRect(x,y,2,2);
 }
 
 /*
@@ -60,14 +78,22 @@ function addMarkerInner( ) {
   this.addMarkerXY(this.x, this.y);
 }
 
+function drawTriangle(x, y, wi, he) {
+  this.drawable.fillStyle = this.color;
+  this.drawable.beginPath();
+  this.drawable.rect(x, y, wi, he);
+  this.drawable.fill();
+}
 /*
  * Adds a lot of markers from a list of coordinates
  * this is different from drawMap because it doesn't draw
  * any lines.
  */
-function addMarkerList(coordinateList) {
-  for( i = 0; i < coordinateList.length; i++)
+function addMarkerList(coordinateList, NameList) {
+  for( i = 0; i < coordinateList.length; i++) {
+    this.name = NameList[i];
     this.addMarkerXY(coordinateList[i][0], coordinateList[i][1]);
+  }
 }
 
 /*
@@ -84,7 +110,8 @@ function addMarkerCoor(coordinates) {
  */
 function clearMarkerXY(x, y) {
   //causes no error if x or y is 0
-  this.drawable.clearRect(x-1,y-1,3,3);
+  //THIS MUST BE C HANGED LATER
+  this.drawable.clearRect(0,0,640,640);
 }
 
 /*

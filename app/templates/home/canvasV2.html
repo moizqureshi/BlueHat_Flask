@@ -13,36 +13,52 @@
     <div class="canvasHolder">
       <canvas id="mainMap" width="640" height="640">  </canvas>
 
-      <canvas id="centeralsMap" width="640" height="640">  </canvas>
+      <canvas id="safeZoneMap" width="640" height="640">  </canvas>
 
+      <canvas id="centeralsMap" width="640" height="640">  </canvas>
     </div>
+
 
 
     <script>
       //Necessary initializing steps
       var mapCoordinates = [ //Polygon coordinates
-        [10, 40],
         [100, 40],
-        [350, 250],
-        [550, 364],
-        [420, 420],
-        [222, 345]
+        [500, 40],
+        [600, 440],
+        [15, 440]
       ];
 
       var centeralsCoordinates = [ //Centeral devices coordinates
-        [75, 75],
-        [250, 250],
-        [400, 300]
+        [125, 65],
+        [475, 65],
+        [125, 415],
+        [475, 415]
       ];
+
+      var safeZoneCoordinates = [
+        [100, 325],
+        [200, 325],
+        [200, 440],
+        [100, 440]
+      ];
+
+      var centeralsNames = ["Observer A", "Observer B", "Observer C", "Observer D"];
 
       //Draws the polygon
       var temp = new Canvas(document.getElementById("mainMap"));
       temp.drawMap(mapCoordinates);
 
+      //Draw safezone
+      temp = new  Canvas(document.getElementById("safeZoneMap"));
+      temp.setColor("#adff2f");
+      temp.drawTriangle(99, 325, 101, 116);
+
       //Draw the centerals in red
       temp = new Canvas(document.getElementById("centeralsMap"));
       temp.setColor("#FF0000");
-      temp.addMarkerList(centeralsCoordinates);
+      temp.addMarkerList(centeralsCoordinates, centeralsNames);
+
     </script>
 
 
@@ -50,32 +66,292 @@
       // Array of mocked JSON
       var JSONs = [
       '{ "peripherals":[' +
-      '{ "personName":"Moiz Qureshi", "x_coord":15, "y_coord":32 },' +
-      '{ "personName":"Ye Huange", "x_coord":50, "y_coord": 24 },' +
-      '{ "personName":"Ben Chafik", "x_coord":100, "y_coord": 100},' +
-      '{ "personName":"Eduardo Rosales", "x_coord":200, "y_coord": 178}' +
+      '{ "personName":"Ye Huange", "x_coord":229, "y_coord": 236 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
       ']}',
 
-      '{"peripherals":[' +
-      '{ "personName":"Moiz Qureshi", "x_coord":20, "y_coord":32 },' +
-      '{ "personName":"Ye Huange", "x_coord":55, "y_coord": 30 },' +
-      '{ "personName":"Ben Chafik", "x_coord":125, "y_coord": 110 },' +
-      '{ "personName":"Eduardo Rosales", "x_coord":205, "y_coord": 180 }' +
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":199, "y_coord": 247 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
       ']}',
 
-      '{"peripherals":[' +
-      '{ "personName":"Moiz Qureshi", "x_coord":25, "y_coord":35 },' +
-      '{ "personName":"Ye Huange", "x_coord":55, "y_coord": 30 },' +
-      '{ "personName":"Ben Chafik", "x_coord":128, "y_coord": 111 },' +
-      '{ "personName":"Eduardo Rosales", "x_coord":215, "y_coord": 190 }' +
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":178, "y_coord": 273 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
       ']}',
 
-      '{"peripherals":[' +
-      '{ "personName":"Moiz Qureshi", "x_coord":30, "y_coord":38 },' +
-      '{ "personName":"Ye Huange", "x_coord":56, "y_coord": 32 },' +
-      '{ "personName":"Ben Chafik", "x_coord":130, "y_coord": 115 },' +
-      '{ "personName":"Eduardo Rosales", "x_coord":230, "y_coord": 210 }' +
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":199, "y_coord": 247 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
       ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":229, "y_coord": 236 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":265, "y_coord": 210 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":299, "y_coord": 189 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":344, "y_coord": 157 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":373, "y_coord": 130 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":402, "y_coord": 115 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":373, "y_coord": 130 },' +
+      '{ "personName":"Ben Chafik", "x_coord":395, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":344, "y_coord": 157 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":299, "y_coord": 189 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":265, "y_coord": 210 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":199, "y_coord": 247 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":178, "y_coord": 273 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":199, "y_coord": 247 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":229, "y_coord": 236 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":265, "y_coord": 210 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":299, "y_coord": 189 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":344, "y_coord": 157 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":373, "y_coord": 130 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":402, "y_coord": 115 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":373, "y_coord": 130 },' +
+      '{ "personName":"Ben Chafik", "x_coord":395, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":344, "y_coord": 157 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":299, "y_coord": 189 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":265, "y_coord": 210 },' +
+      '{ "personName":"Ben Chafik", "x_coord":402, "y_coord": 110},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+      //explostion here?
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":265, "y_coord": 210 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":265, "y_coord": 210 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":178, "y_coord": 268}' +
+      ']}',
+
+      //run bruh
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":240, "y_coord": 235 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":168, "y_coord": 285}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":223, "y_coord": 274 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":164, "y_coord": 311}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":211, "y_coord": 299 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":155, "y_coord": 339}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":187, "y_coord": 326 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":129, "y_coord": 367}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":174, "y_coord": 360 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":129, "y_coord": 367}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":164, "y_coord": 378 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":129, "y_coord": 367}' +
+      ']}',
+
+      //heading back to get ben
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":194, "y_coord": 346 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":174, "y_coord": 350}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":211, "y_coord": 317 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":195, "y_coord": 324}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":244, "y_coord": 292 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":233, "y_coord": 296}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":288, "y_coord": 257 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":275, "y_coord": 261}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":328, "y_coord": 220 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":316, "y_coord": 227}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":370, "y_coord": 173 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":357, "y_coord": 177}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":402, "y_coord": 144 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":392, "y_coord": 148}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":405, "y_coord": 120 },' +
+      '{ "personName":"Ben Chafik", "x_coord":400, "y_coord": 115},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":395, "y_coord": 122}' +
+      ']}',
+      //dragin fatso
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":376, "y_coord": 163},' +
+      '{ "personName":"Ben Chafik", "x_coord":376, "y_coord": 158},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":371, "y_coord": 158}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":347, "y_coord": 181 },' +
+      '{ "personName":"Ben Chafik", "x_coord":347, "y_coord": 176},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":342, "y_coord": 176}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":324, "y_coord": 204 },' +
+      '{ "personName":"Ben Chafik", "x_coord":324, "y_coord": 199},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":319, "y_coord": 199}' +
+      ']}',
+
+      '{ "peripherals":[' +
+      '{ "personName":"Ye Huange", "x_coord":310, "y_coord": 228 },' +
+      '{ "personName":"Ben Chafik", "x_coord":310, "y_coord": 223},' +
+      '{ "personName":"Eduardo Rosales", "x_coord":305, "y_coord": 223}' +
+      ']}'
     ];
 
     /*
@@ -132,11 +408,13 @@
       console.log(counter);
       //gives a JSON to socketio function.
       socketio(JSONs[counter]);
-      counter = (counter + 1) % 4;
+      counter = (counter + 1);
+
+      if(counter == JSONs.length) clearInterval(tm);
     }
 
     //Run "runner()" every 2seconds.
-    setInterval(function(){runner();}, 2000);
+    setInterval(function(){runner();}, 1750);
     </script>
 
   </body>

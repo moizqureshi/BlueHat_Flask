@@ -1,9 +1,9 @@
 canvas {
   background-color: transparent;
-  border: 1px solid #000000 ;
+  border: 2px solid #000000 ;
+  border: double;
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 25%;
 }
 
 .mainMap {
@@ -12,6 +12,10 @@ canvas {
 
 .centeralsMap {
   z-index: 1;
+}
+
+.safeZoneMap {
+  z-index: 0;
 }
 
 #canvasHolder {

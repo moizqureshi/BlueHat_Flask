@@ -1,0 +1,29 @@
+<script>
+var jason = '[ ' +
+  '{"deviceID": "aaaaaaaa", "yCoord": 34.93194384110424, "xCoord": 15.068056158895759},' +
+  '{"deviceID": "bbbbbbbb", "yCoord": 34.08787329619518, "xCoord": 17.58677094463131},' +
+  '{"deviceID": "cccccccc", "yCoord": 34.93194384110424, "xCoord": 15.068056158895759}' +
+  ']';
+console.log(JSON.parse(jason)[0].deviceID);
+
+function socketio(data) {
+  //Parse the JSON object
+  var parsed_data = JSON.parse(data);
+
+  //Go through each peripheral within the JSON
+  for( i = 0; i < parsed_datalength; i++) {
+    //check if the peripheral is new
+    if(isPeriNew(parsed_data[i].deviceID)) {
+      //if it is, add a new canvas tag for it and save the name id of that.
+      var canvas_name = canvasAdder(parsed_data[i].deviceID);
+      var periName = "Peripheral_" + i;
+      //then add the canvas JS and draw a point at x and y
+      addPeri(parsed_data[i].deviceID, periNamecanvas_name, parsed_data[i].xCoord, parsed_data[i].yCoord);
+    }
+
+    else //if the peripheral is not new then update it no matter what.
+      updatePeri(parsed_data[i].deviceID, parsed_data[i].xCoord, parsed_data[i].yCoord);
+  } //updating no matter what saves us time by not iterating through a list to check who has moved or not and isntead just do a O(n) and update everyone.
+}
+
+</script>
