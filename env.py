@@ -1,4 +1,4 @@
-FLASK_CONFIG = 'development'
+FLASK_CONFIG = 'production'
 THE_SECRET_KEY = 'vt1(h3c#$z6gyp6jkfpi^w+*x3#mq!_0aifwr^*nf)l02+dij4'
 HEROKU_DB_URL = 'postgres://pkqbtftlzuihgc:b04c976f2f4e037059ccbf51a5a2832197e84914854b67ce95cc7ebdb6ffa504@ec2-23-23-228-115.compute-1.amazonaws.com:5432/dd3a07vp45jl5m'
 DB_USER = 'bluehat_admin'
