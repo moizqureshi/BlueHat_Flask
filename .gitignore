@@ -4,3 +4,4 @@
 .DS_STORE
 flask/
 flask_session/
+locustfile.py
