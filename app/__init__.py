@@ -35,6 +35,7 @@ app.config.from_object(app_config[FLASK_CONFIG])
 app.config.from_pyfile('config.py')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_POOL_SIZE'] = 100
 app.config['CDN_DOMAIN'] = 'd30bzjua38r0w8.cloudfront.net'
 app.config['CDN_HTTPS'] = True
 app.config['CDN_DEBUG'] = True
